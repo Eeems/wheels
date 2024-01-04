@@ -49,6 +49,7 @@ jobs:
       matrix:
         package:
           - cryptography
+          - bcrypt
         python:
           - '3.11'
           - '3.10'
