@@ -1,0 +1,78 @@
+name: 'Build wheel for pypi package'
+description: Build a wheel for a pypi package
+author: Eeems
+branding:
+  icon: tablet
+  color: white
+inputs:
+  name:
+    description: Package name to build
+    required: true
+  output_dir:
+    description: Output directory to place the wheels
+    required: false
+    default: ${{ github.workspace }}/dist
+  python_version:
+    description: Python version to use
+    required: false
+    default: '3.11'
+    type: choice
+    options:
+      - '3.11'
+      - '3.10'
+      - '3.9'
+  build_on:
+    description: Build target to use
+    required: false
+    default: 'ubuntu-amd64'
+    type: choice
+    options:
+      - ubuntu-amd64
+      - debian-armv7l
+  setup:
+    description: Setup script to run building the package
+    required: false
+    default: ''
+runs:
+  using: composite
+  steps:
+    - name: Set up QEMU
+      if: inputs.build_on == 'debian-armv7l'
+      uses: docker/setup-qemu-action@v3
+    - name: Set up Docker Buildx
+      if: inputs.build_on == 'debian-armv7l'
+      uses: docker/setup-buildx-action@v3
+    - name: Build Wheel
+      if: inputs.build_on == 'debian-armv7l'
+      shell: bash
+      run: |
+        docker run \
+          --rm \
+          --platform=linux/arm/v7 \
+          -v "${src_path}":/workspace \
+          -v "${{ github.action_path }}":/action \
+          eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
+          bash -ec "$setup;\n$script"
+        done
+      env:
+        src_path: ${{ inputs.output_dir }}
+        script: |
+          source /opt/lib/nuitka/bin/activate
+          pip install --upgrade pip wheel build requests
+          cd /tmp
+          /action/build.py "${{ inputs.name }}" "/workspace"
+        setup: ${{ inputs.setup }}
+
+    - uses: actions/setup-python@v4
+      if: inputs.build_on == 'ubuntu-amd64'
+      with:
+        python-version: ${{ inputs.python_version }}
+    - name: Build Wheel
+      if: inputs.build_on == 'ubuntu-amd64'
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: |
+        pip install --upgrade pip wheel build requests
+        "${{ github.action_path }}/build.py" "${{ inputs.name }}" "${{ inputs.output_dir  }}"
+      env:
+        setup: ${{ inputs.setup }}

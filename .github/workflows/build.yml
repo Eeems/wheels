@@ -1,0 +1,74 @@
+name: Build Wheels
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [released]
+permissions: read-all
+jobs:
+  standard:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - cffi
+          - crcmod
+          - nuitka
+          - protobuf
+          - zstandard
+        python:
+          - '3.11'
+          - '3.10'
+          - '3.9'
+        build_on:
+          - ubuntu-amd64
+          - debian-armv7l
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          python_version: ${{ matrix.python }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: error
+  rust:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - cryptography
+        python:
+          - '3.11'
+          - '3.10'
+          - '3.9'
+        build_on:
+          - ubuntu-amd64
+          - debian-armv7l
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          python_version: ${{ matrix.python }}
+          setup: |
+            curl https://sh.rustup.rs -sSf | sh -s -- -y
+            source "$HOME/.cargo/env"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: error
