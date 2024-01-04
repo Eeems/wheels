@@ -36,6 +36,7 @@ jobs:
         uses: ./
         with:
           name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
       - uses: actions/upload-artifact@v3
         with:
@@ -65,6 +66,7 @@ jobs:
         uses: ./
         with:
           name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
           setup: |
             curl https://sh.rustup.rs -sSf | sh -s -- -y
