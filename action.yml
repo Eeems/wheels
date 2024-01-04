@@ -52,16 +52,32 @@ runs:
           -v "${src_path}":/workspace \
           -v "${{ github.action_path }}":/action \
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
-          bash -ec "$setup;\n$script"
-        done
+          bash -ec "$script"
       env:
         src_path: ${{ inputs.output_dir }}
         script: |
+          echo 'Running setup'
+          ${{ inputs.setup }}
+          echo 'Running script'
+          cat > ~/.pypirc << EOF
+            [distutils]
+            index-servers =
+                pypi
+                eeems
+
+            [pypi]
+
+            [eeems]
+            repository = https://wheels.eeems.codes/
+          EOF
           source /opt/lib/nuitka/bin/activate
-          pip install --upgrade pip wheel build requests
+          pip install --upgrade \
+            pip \
+            wheel \
+            build \
+            requests
           cd /tmp
           /action/build.py "${{ inputs.name }}" "/workspace"
-        setup: ${{ inputs.setup }}
 
     - uses: actions/setup-python@v4
       if: inputs.build_on == 'ubuntu-amd64'

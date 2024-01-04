@@ -34,7 +34,7 @@ def main(name, output_dir):
         ["tar", "-xf", "src.tar.gz", "--strip-components=1", "--directory=src"]
     )
     subprocess.check_call(["python", "-m", "build", "--wheel"], cwd="src")
-    shutil.copytree("src/dist/", output_dir)
+    shutil.copytree("src/dist/", output_dir, dirs_exist_ok=True)
 
 
 main(sys.argv[1], sys.argv[2])

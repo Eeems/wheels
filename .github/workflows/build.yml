@@ -21,6 +21,7 @@ jobs:
           - nuitka
           - protobuf
           - zstandard
+          - pynacl
         python:
           - '3.11'
           - '3.10'
@@ -67,7 +68,7 @@ jobs:
           python_version: ${{ matrix.python }}
           setup: |
             curl https://sh.rustup.rs -sSf | sh -s -- -y
-            source "$HOME/.cargo/env"
+            source ~/.cargo/env
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}

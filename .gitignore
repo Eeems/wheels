@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 src.tar.gz
 src/
+*.whl
