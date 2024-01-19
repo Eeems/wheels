@@ -22,7 +22,7 @@ jobs:
           - protobuf
           - zstandard
           - pynacl
-          - exodus-extractor
+          - exodus-bundler
         python:
           - '3.11'
           - '3.10'
