@@ -22,7 +22,6 @@ jobs:
           - protobuf
           - zstandard
           - pynacl
-          - exodus-bundler
         python:
           - '3.11'
           - '3.10'
@@ -75,5 +74,25 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: error
+  universal:
+    name: ${{ matrix.package }}-py2.py3-none-any
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - exodus-bundler
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.package }}-py2.py3-none-any
           path: dist
           if-no-files-found: error
