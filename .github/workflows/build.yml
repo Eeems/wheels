@@ -38,7 +38,7 @@ jobs:
           name: ${{ matrix.package }}
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -71,7 +71,7 @@ jobs:
           setup: |
             curl https://sh.rustup.rs -sSf | sh -s -- -y
             source ~/.cargo/env
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -91,7 +91,7 @@ jobs:
         uses: ./
         with:
           name: ${{ matrix.package }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}-py2.py3-none-any
           path: dist
