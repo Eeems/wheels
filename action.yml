@@ -79,7 +79,7 @@ runs:
           cd /tmp
           /action/build.py "${{ inputs.name }}" "/workspace"
 
-    - uses: actions/setup-python@v4
+    - uses: actions/setup-python@v5
       if: inputs.build_on == 'ubuntu-amd64'
       with:
         python-version: ${{ inputs.python_version }}
