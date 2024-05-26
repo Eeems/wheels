@@ -97,7 +97,9 @@ jobs:
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
           setup: |
-            apt install \
+            export DEBIAN_FRONTEND="noninteractive"
+            apt-get update
+            apt-get install -y \
               dpkg-dev \
               build-essential \
               python3-dev \
