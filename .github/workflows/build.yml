@@ -53,6 +53,7 @@ jobs:
         package:
           - remarkable-update-image
           - remarkable-update-fuse
+          - wxpython
         python:
           - '3.12'
           - '3.11'
