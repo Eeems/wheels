@@ -51,8 +51,8 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          - remarkable_update_image
-          - remarkable_update_fuse
+          - remarkable-update-image
+          - remarkable-update-fuse
         python:
           - '3.12'
           - '3.11'
