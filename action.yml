@@ -58,7 +58,7 @@ runs:
         script: |
           echo 'Running setup'
           ${{ inputs.setup }}
-          echo 'Running script'
+          echo 'Installing requirements'
           cat > ~/.pypirc << EOF
             [distutils]
             index-servers =
@@ -77,8 +77,15 @@ runs:
             build \
             requests
           cd /tmp
+          echo 'Building'
           /action/build.py "${{ inputs.name }}" "/workspace"
-
+    - name: Run setup
+      if: inputs.build_on == 'ubuntu-amd64'
+      shell: bash
+      working-directory: ${{ runner.temp }}
+      run: |
+        echo 'Running setup'
+        ${{ inputs.setup }}
     - uses: actions/setup-python@v5
       if: inputs.build_on == 'ubuntu-amd64'
       with:
@@ -88,7 +95,9 @@ runs:
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
+        echo 'Installing requirements'
         pip install --upgrade pip wheel build requests
+        echo 'Building'
         "${{ github.action_path }}/build.py" "${{ inputs.name }}" "${{ inputs.output_dir  }}"
       env:
         setup: ${{ inputs.setup }}
