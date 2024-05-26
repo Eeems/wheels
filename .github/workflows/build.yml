@@ -99,7 +99,6 @@ jobs:
           setup: |
             export DEBIAN_FRONTEND="noninteractive"
             sudo apt-get -y update
-            sudo apt-get remove libunwind-*
             sudo apt-get install -y \
               dpkg-dev \
               build-essential \
