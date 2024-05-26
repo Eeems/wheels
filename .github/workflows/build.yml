@@ -99,7 +99,6 @@ jobs:
           setup: |
             export DEBIAN_FRONTEND="noninteractive"
             sudo apt-get update
-            sudo apt-get upgrade -y
             sudo apt-get install -y \
               dpkg-dev \
               build-essential \
@@ -116,7 +115,8 @@ jobs:
               libsm-dev \
               libtiff-dev \
               libwebkit2gtk-4.0-dev \
-              libxtst-dev
+              libxtst-dev \
+              libunwind-dev
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
