@@ -33,7 +33,10 @@ def main(name, output_dir):
     subprocess.check_call(
         ["tar", "-xf", "src.tar.gz", "--strip-components=1", "--directory=src"]
     )
-    subprocess.check_call(["python", "-m", "build", "--wheel"], cwd="src")
+    subprocess.check_call(
+        ["python", "-m", "build", "--wheel", os.path.join(os.getcwd(), "src")],
+        cwd="/tmp",  # To avoid the build module referencing this file
+    )
     shutil.copytree("src/dist/", output_dir, dirs_exist_ok=True)
 
 
