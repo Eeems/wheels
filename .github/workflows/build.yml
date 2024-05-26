@@ -97,9 +97,13 @@ jobs:
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
           setup: |
+            SUDO=''
+            if [ "$EUID" -ne 0 ]; then
+              SUDO=sudo
+            fi
             export DEBIAN_FRONTEND="noninteractive"
-            sudo apt-get -y update
-            sudo apt-get install -y \
+            $SUDO apt-get -y update
+            $SUDO apt-get install -y \
               dpkg-dev \
               build-essential \
               python3-dev \

@@ -56,7 +56,6 @@ runs:
       env:
         src_path: ${{ inputs.output_dir }}
         script: |
-          alias sudo=
           echo 'Running setup'
           ${{ inputs.setup }}
           echo 'Installing requirements'
