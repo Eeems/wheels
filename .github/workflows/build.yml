@@ -183,7 +183,7 @@ jobs:
           if-no-files-found: ignore
 
   mirror:
-    name: Mirror
+    name: Deploy
     environment: wheels.eeems.codes
     runs-on: self-hosted
     needs:
@@ -204,7 +204,7 @@ jobs:
       - name: Create directories
         run: |
           python -u create_dirs.py ${{ github.workspace }}/artifacts ${{ github.workspace }}/dist
-          tree ${{ github.workspace }}/dist
+          ls -l ${{ github.workspace }}/dist/*
       - name: Sync with wheels.eeems.codes
         uses: up9cloud/action-rsync@v1.4
         env:
