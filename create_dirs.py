@@ -16,7 +16,7 @@ def main(input_dir, output_dir):
     if not os.path.exists(output_dir):
         os.mkdir(output_dir)
 
-    for path in iglob(os.path.join(input_dir, "*.whl")):
+    for path in iglob("**/*.whl", recursive=True, root_dir=input_dir):
         basename = os.path.basename(path)
         info = _WHEEL_FILENAME_REGEX.match(basename)
         name = info.group("distribution").lower()
