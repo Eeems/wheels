@@ -207,14 +207,19 @@ jobs:
         run: |
           python -u create_dirs.py ./artifacts ./dist
       - name: Sync with wheels.eeems.codes
-        uses: up9cloud/action-rsync@v1.4
+        run: |
+          touch "$KEY_LOCATION"
+          chmod 600 "$KEY_LOCATION"
+          echo "$SSH_KEY" > "$KEY_LOCATION"
+          rsync \
+            -Pcuav \
+            -e "ssh -p 22 -oStrictHostKeyChecking=no -i \"$KEY_LOCATION\"" \
+            ./dist/* \
+            "$USER@$SERVER:$DIR/"
+          rm "$KEY_LOCATION"
         env:
-          HOST: ${{ vars.SSH_SERVER }}
-          KEY: ${{secrets.SSH_KEY}}
-          TARGET: ${{ vars.SSH_PATH }}
+          KEY_LOCATION: ${{ runner.temp }}/server_key
+          SSH_HOST: ${{ vars.SSH_SERVER }}
+          SSH_KEY: ${{secrets.SSH_KEY}}
+          DIR: ${{ vars.SSH_PATH }}
           USER: ${{ vars.SSH_USER }}
-          ARGS: -az
-          SOURCE: ./dist
-          VERBOSE: true
-          RUN_SCRIPT_ON: source
-          PRE_SCRIPT: ls -l ./dist
