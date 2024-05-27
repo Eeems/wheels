@@ -89,23 +89,19 @@ def main(name, output_dir):
         )
         print(f"Checking if {wheelname} exists")
         wheelpath = os.path.join(output_dir, wheelname)
-        if (
-            requests.head(f"https://wheels.eeems.codes/{name}/{wheelname}").status_code
-            == 200
-        ):
+        url = f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
+        if requests.head(url).status_code == 200:
             print("Downloading wheel")
             if not os.path.exists(output_dir):
                 os.mkdir(output_dir)
 
-            resp = requests.get(
-                f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
-            )
+            resp = requests.get(url)
             with open(wheelpath, "wb") as f:
                 f.write(resp.content)
 
         else:
             print("Building wheel")
-            wheelpath = builder.build("wheel", output_dir)
+            # wheelpath = builder.build("wheel", output_dir)
 
         print(wheelpath)
 
