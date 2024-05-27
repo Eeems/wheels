@@ -87,7 +87,7 @@ def main(name, output_dir):
                 Extension(name, ["dummy.c"])  # We assume this needs to be compiled
             ],
         )
-        print("Checking if wheel exists")
+        print(f"Checking if {wheelname} exists")
         wheelpath = os.path.join(output_dir, wheelname)
         if (
             requests.head(f"https://wheels.eeems.codes/{name}/{wheelname}").status_code
