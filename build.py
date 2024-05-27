@@ -90,20 +90,11 @@ def main(name, output_dir):
         print(f"Checking if {wheelname} exists")
         wheelpath = os.path.join(output_dir, wheelname)
         url = f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
-        if requests.head(url).status_code == 200:
-            print("Downloading wheel")
-            if not os.path.exists(output_dir):
-                os.mkdir(output_dir)
-
-            resp = requests.get(url)
-            with open(wheelpath, "wb") as f:
-                f.write(resp.content)
-
-        else:
+        if requests.head(url).status_code != 200:
             print("Building wheel")
-            wheelpath = builder.build("wheel", output_dir)
+            builder.build("wheel", output_dir)
 
-        print(wheelpath)
+        print("Done")
 
 
 main(sys.argv[1], sys.argv[2])
