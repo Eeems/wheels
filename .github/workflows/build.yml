@@ -204,6 +204,7 @@ jobs:
       - name: Create directories
         run: |
           python -u create_dirs.py ${{ github.workspace }}/artifacts ${{ github.workspace }}/dist
+          tree ${{ github.workspace }}/dist
       - name: Sync with wheels.eeems.codes
         uses: up9cloud/action-rsync@v1.4
         env:
