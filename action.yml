@@ -75,7 +75,8 @@ runs:
             pip \
             wheel \
             build \
-            requests
+            requests \
+            setuptools
           cd /tmp
           echo 'Building'
           /action/build.py "${{ inputs.name }}" "/workspace"

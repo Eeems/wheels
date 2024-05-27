@@ -14,9 +14,9 @@ from build.env import DefaultIsolatedEnv
 from build.env import Installer
 
 from pathlib import Path
-from importlib.metadata import PathDistribution
 from setuptools import Extension
 from setuptools.dist import Distribution
+from importlib.metadata import PathDistribution
 from pyproject_hooks import quiet_subprocess_runner
 
 
