@@ -97,6 +97,17 @@ runs:
       working-directory: ${{ runner.temp }}
       run: |
         echo 'Installing requirements'
+        cat > ~/.pypirc << EOF
+          [distutils]
+          index-servers =
+              pypi
+              eeems
+
+          [pypi]
+
+          [eeems]
+          repository = https://wheels.eeems.codes/
+        EOF
         pip install --upgrade \
             pip \
             wheel \
