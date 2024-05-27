@@ -20,12 +20,13 @@ from importlib.metadata import PathDistribution
 from pyproject_hooks import quiet_subprocess_runner
 
 
-def wheel_name(**kwargs):
+def wheel_name(universal=False, **kwargs):
     # create a fake distribution from arguments
     dist = Distribution(attrs=kwargs)
     # finalize bdist_wheel command
     bdist_wheel_cmd = dist.get_command_obj("bdist_wheel")
     bdist_wheel_cmd.ensure_finalized()
+    bdist_wheel_cmd.universal = universal
     # assemble wheel file name
     distname = bdist_wheel_cmd.wheel_dist_name
     tag = "-".join(bdist_wheel_cmd.get_tag())
@@ -80,12 +81,12 @@ def main(name, output_dir):
         print("Getting wheel name")
         dist = PathDistribution(Path(metadatapath))
         name = dist.name
+        universal = "UNIVERSAL" in os.environ
         wheelname = wheel_name(
             name=name,
             version=dist.version,
-            ext_modules=[
-                Extension(name, ["dummy.c"])  # We assume this needs to be compiled
-            ],
+            ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
+            universal=universal,
         )
         print(f"Checking if {wheelname} exists")
         wheelpath = os.path.join(output_dir, wheelname)
