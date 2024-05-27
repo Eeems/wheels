@@ -101,7 +101,7 @@ def main(name, output_dir):
 
         else:
             print("Building wheel")
-            # wheelpath = builder.build("wheel", output_dir)
+            wheelpath = builder.build("wheel", output_dir)
 
         print(wheelpath)
 

@@ -46,9 +46,9 @@ jobs:
       - name: Sync with wheels.eeems.codes
         uses: up9cloud/action-rsync@v1.4
         env:
-          HOST: ${{ secrets.SSH_SERVER }}
+          HOST: ${{ vars.SSH_SERVER }}
           KEY: ${{secrets.SSH_KEY}}
-          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          TARGET: ${{ vars.SSH_PATH }}/${{ matrix.package }}/
           USER: ${{ vars.SSH_USER }}
           ARGS: -az
           SOURCE: ./dist/*.whl
@@ -84,9 +84,9 @@ jobs:
       - name: Sync with wheels.eeems.codes
         uses: up9cloud/action-rsync@v1.4
         env:
-          HOST: ${{ secrets.SSH_SERVER }}
+          HOST: ${{ vars.SSH_SERVER }}
           KEY: ${{secrets.SSH_KEY}}
-          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          TARGET: ${{ vars.SSH_PATH }}/${{ matrix.package }}/
           USER: ${{ vars.SSH_USER }}
           ARGS: -az
           SOURCE: ./dist/*.whl
@@ -145,9 +145,9 @@ jobs:
       - name: Sync with wheels.eeems.codes
         uses: up9cloud/action-rsync@v1.4
         env:
-          HOST: ${{ secrets.SSH_SERVER }}
+          HOST: ${{ vars.SSH_SERVER }}
           KEY: ${{secrets.SSH_KEY}}
-          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          TARGET: ${{ vars.SSH_PATH }}/${{ matrix.package }}/
           USER: ${{ vars.SSH_USER }}
           ARGS: -az
           SOURCE: ./dist/*.whl
@@ -187,9 +187,9 @@ jobs:
       - name: Sync with wheels.eeems.codes
         uses: up9cloud/action-rsync@v1.4
         env:
-          HOST: ${{ secrets.SSH_SERVER }}
+          HOST: ${{ vars.SSH_SERVER }}
           KEY: ${{secrets.SSH_KEY}}
-          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          TARGET: ${{ vars.SSH_PATH }}/${{ matrix.package }}/
           USER: ${{ vars.SSH_USER }}
           ARGS: -az
           SOURCE: ./dist/*.whl
@@ -216,9 +216,9 @@ jobs:
       - name: Sync with wheels.eeems.codes
         uses: up9cloud/action-rsync@v1.4
         env:
-          HOST: ${{ secrets.SSH_SERVER }}
+          HOST: ${{ vars.SSH_SERVER }}
           KEY: ${{secrets.SSH_KEY}}
-          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          TARGET: ${{ vars.SSH_PATH }}/${{ matrix.package }}/
           USER: ${{ vars.SSH_USER }}
           ARGS: -az
           SOURCE: ./dist/*.whl
