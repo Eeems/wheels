@@ -28,5 +28,7 @@ def main(input_dir, output_dir):
         if not os.path.exists(filepath):
             os.link(path, filepath)
 
+        print(filepath)
+
 
 main(sys.argv[1], sys.argv[2])
