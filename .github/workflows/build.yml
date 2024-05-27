@@ -208,15 +208,17 @@ jobs:
           python -u create_dirs.py ./artifacts ./dist
       - name: Sync with wheels.eeems.codes
         run: |
-          touch "$KEY_LOCATION"
-          chmod 600 "$KEY_LOCATION"
-          echo "$SSH_KEY" > "$KEY_LOCATION"
-          rsync \
-            -Pcuav \
-            -e "ssh -p 22 -oStrictHostKeyChecking=no -i \"$KEY_LOCATION\"" \
-            ./dist/* \
-            "$SSH_USER@$SSH_HOST:$SSH_DIR/"
-          rm "$KEY_LOCATION"
+          if ! [ -z "$(ls -A ./dist)" ]; then
+            touch "$KEY_LOCATION"
+            chmod 600 "$KEY_LOCATION"
+            echo "$SSH_KEY" > "$KEY_LOCATION"
+            rsync \
+              -Pcuav \
+              -e "ssh -p 22 -oStrictHostKeyChecking=no -i \"$KEY_LOCATION\"" \
+              ./dist/* \
+              "$SSH_USER@$SSH_HOST:$SSH_DIR/"
+            rm "$KEY_LOCATION"
+          fi;
         env:
           KEY_LOCATION: ${{ runner.temp }}/server_key
           SSH_HOST: ${{ vars.SSH_SERVER }}
