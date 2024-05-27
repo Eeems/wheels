@@ -9,124 +9,124 @@ on:
     - cron: '0 0 * * *'
 permissions: read-all
 jobs:
-  # standard:
-  #   name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       package:
-  #         # - cffi
-  #         # - crcmod
-  #         # - nuitka
-  #         # - protobuf
-  #         # - zstandard
-  #         - pynacl
-  #       python:
-  #         - '3.12'
-  #         - '3.11'
-  #         - '3.10'
-  #       build_on:
-  #         - ubuntu-amd64
-  #         - debian-armv7l
-  #   steps:
-  #     - name: Checkout the Git repository
-  #       uses: actions/checkout@v4
-  #     - name: Build ${{ matrix.package }}
-  #       uses: ./
-  #       with:
-  #         name: ${{ matrix.package }}
-  #         build_on: ${{ matrix.build_on }}
-  #         python_version: ${{ matrix.python }}
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-  #         path: dist
-  #         if-no-files-found: ignore
-  #
-  # standard-3_11:
-  #   name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       package:
-  #         - remarkable-update-image
-  #         - remarkable-update-fuse
-  #       python:
-  #         - '3.12'
-  #         - '3.11'
-  #       build_on:
-  #         - ubuntu-amd64
-  #         - debian-armv7l
-  #   steps:
-  #     - name: Checkout the Git repository
-  #       uses: actions/checkout@v4
-  #     - name: Build ${{ matrix.package }}
-  #       uses: ./
-  #       with:
-  #         name: ${{ matrix.package }}
-  #         build_on: ${{ matrix.build_on }}
-  #         python_version: ${{ matrix.python }}
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-  #         path: dist
-  #         if-no-files-found: ignore
-  #
-  # wxpython:
-  #   name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       package:
-  #         - wxpython
-  #       python:
-  #         - '3.12'
-  #         - '3.11'
-  #       build_on:
-  #         - ubuntu-amd64
-  #   steps:
-  #     - name: Checkout the Git repository
-  #       uses: actions/checkout@v4
-  #     - name: Build ${{ matrix.package }}
-  #       uses: ./
-  #       with:
-  #         name: ${{ matrix.package }}
-  #         build_on: ${{ matrix.build_on }}
-  #         python_version: ${{ matrix.python }}
-  #         setup: |
-  #           SUDO=''
-  #           if [ "$EUID" -ne 0 ]; then
-  #             SUDO=sudo
-  #           fi
-  #           export DEBIAN_FRONTEND="noninteractive"
-  #           $SUDO apt-get -y update
-  #           $SUDO apt-get install -y \
-  #             dpkg-dev \
-  #             build-essential \
-  #             python3-dev \
-  #             freeglut3-dev \
-  #             libgl1-mesa-dev \
-  #             libglu1-mesa-dev \
-  #             libgstreamer-plugins-base1.0-dev \
-  #             libgtk-3-dev \
-  #             libjpeg-dev \
-  #             libnotify-dev \
-  #             libpng-dev \
-  #             libsdl2-dev \
-  #             libsm-dev \
-  #             libtiff-dev \
-  #             libwebkit2gtk-4.0-dev \
-  #             libxtst-dev \
-  #             libunwind-dev
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-  #         path: dist
-  #         if-no-files-found: ignore
-  #
+  standard:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          # - cffi
+          # - crcmod
+          # - nuitka
+          # - protobuf
+          # - zstandard
+          - pynacl
+        python:
+          - '3.12'
+          - '3.11'
+          - '3.10'
+        build_on:
+          - ubuntu-amd64
+          - debian-armv7l
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
+          python_version: ${{ matrix.python }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: ignore
+
+  standard-3_11:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - remarkable-update-image
+          - remarkable-update-fuse
+        python:
+          - '3.12'
+          - '3.11'
+        build_on:
+          - ubuntu-amd64
+          - debian-armv7l
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
+          python_version: ${{ matrix.python }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: ignore
+
+  wxpython:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - wxpython
+        python:
+          - '3.12'
+          - '3.11'
+        build_on:
+          - ubuntu-amd64
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
+          python_version: ${{ matrix.python }}
+          setup: |
+            SUDO=''
+            if [ "$EUID" -ne 0 ]; then
+              SUDO=sudo
+            fi
+            export DEBIAN_FRONTEND="noninteractive"
+            $SUDO apt-get -y update
+            $SUDO apt-get install -y \
+              dpkg-dev \
+              build-essential \
+              python3-dev \
+              freeglut3-dev \
+              libgl1-mesa-dev \
+              libglu1-mesa-dev \
+              libgstreamer-plugins-base1.0-dev \
+              libgtk-3-dev \
+              libjpeg-dev \
+              libnotify-dev \
+              libpng-dev \
+              libsdl2-dev \
+              libsm-dev \
+              libtiff-dev \
+              libwebkit2gtk-4.0-dev \
+              libxtst-dev \
+              libunwind-dev
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: ignore
+
   rust:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
@@ -134,7 +134,7 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          # - cryptography
+          - cryptography
           - bcrypt
         python:
           - '3.12'
@@ -160,40 +160,40 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-  #
-  # universal:
-  #   name: ${{ matrix.package }}-py2.py3-none-any
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       package:
-  #         - exodus-bundler
-  #   steps:
-  #     - name: Checkout the Git repository
-  #       uses: actions/checkout@v4
-  #     - name: Build ${{ matrix.package }}
-  #       uses: ./
-  #       with:
-  #         name: ${{ matrix.package }}
-  #       env:
-  #         UNIVERSAL: 1
-  #     - uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ${{ matrix.package }}-py2.py3-none-any
-  #         path: dist
-  #         if-no-files-found: ignore
+
+  universal:
+    name: ${{ matrix.package }}-py2.py3-none-any
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - exodus-bundler
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+        env:
+          UNIVERSAL: 1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package }}-py2.py3-none-any
+          path: dist
+          if-no-files-found: ignore
 
   mirror:
     name: Deploy
     environment: wheels.eeems.codes
     runs-on: self-hosted
     needs:
-      # - standard
-      # - standard-3_11
-      # - wxpython
+      - standard
+      - standard-3_11
+      - wxpython
       - rust
-      # - universal
+      - universal
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v4
