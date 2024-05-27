@@ -97,7 +97,12 @@ runs:
       working-directory: ${{ runner.temp }}
       run: |
         echo 'Installing requirements'
-        pip install --upgrade pip wheel build requests
+        pip install --upgrade \
+            pip \
+            wheel \
+            build \
+            requests \
+            setuptools
         echo 'Building'
         "${{ github.action_path }}/build.py" "${{ inputs.name }}" "${{ inputs.output_dir  }}"
       env:
