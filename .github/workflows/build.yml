@@ -200,10 +200,10 @@ jobs:
           python-version: '3.11'
       - uses: actions/download-artifact@v4
         with:
-          path: ./artifacts
+          path: ${{ github.workspace }}/artifacts
       - name: Create directories
         run: |
-          python -u create_dirs.py ./artifacts ./dist
+          python -u create_dirs.py ${{ github.workspace }}/artifacts ${{ github.workspace }}/dist
       - name: Sync with wheels.eeems.codes
         uses: up9cloud/action-rsync@v1.4
         env:
@@ -212,4 +212,4 @@ jobs:
           TARGET: ${{ vars.SSH_PATH }}
           USER: ${{ vars.SSH_USER }}
           ARGS: -az
-          SOURCE: ./dist
+          SOURCE: ${{ github.workspace }}/dist
