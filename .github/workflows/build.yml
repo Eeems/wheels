@@ -26,7 +26,6 @@ jobs:
           - '3.12'
           - '3.11'
           - '3.10'
-          - '3.9'
         build_on:
           - ubuntu-amd64
           - debian-armv7l
@@ -138,7 +137,6 @@ jobs:
           - '3.12'
           - '3.11'
           - '3.10'
-          - '3.9'
         build_on:
           - ubuntu-amd64
           - debian-armv7l

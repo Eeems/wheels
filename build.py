@@ -91,6 +91,9 @@ def main(name, output_dir):
             == 200
         ):
             print("Downloading wheel")
+            if not os.path.exists(output_dir):
+                os.mkdir(output_dir)
+
             resp = requests.get(f"https://wheels.eeems.codes/{name}/{wheelname}")
             with open(wheelpath, "wb") as f:
                 f.write(resp.content)
