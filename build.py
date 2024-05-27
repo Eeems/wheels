@@ -97,7 +97,9 @@ def main(name, output_dir):
             if not os.path.exists(output_dir):
                 os.mkdir(output_dir)
 
-            resp = requests.get(f"https://wheels.eeems.codes/{name}/{wheelname}")
+            resp = requests.get(
+                f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
+            )
             with open(wheelpath, "wb") as f:
                 f.write(resp.content)
 
