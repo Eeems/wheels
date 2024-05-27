@@ -43,6 +43,15 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: error
+      - name: Sync with wheels.eeems.codes
+        uses: up9cloud/action-rsync@v1.4
+        env:
+          HOST: ${{ secrets.SSH_SERVER }}
+          KEY: ${{secrets.SSH_KEY}}
+          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          USER: ${{ vars.SSH_USER }}
+          ARGS: -az
+          SOURCE: ./dist/*.whl
   standard-3_11:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
@@ -72,6 +81,15 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: error
+      - name: Sync with wheels.eeems.codes
+        uses: up9cloud/action-rsync@v1.4
+        env:
+          HOST: ${{ secrets.SSH_SERVER }}
+          KEY: ${{secrets.SSH_KEY}}
+          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          USER: ${{ vars.SSH_USER }}
+          ARGS: -az
+          SOURCE: ./dist/*.whl
   wxpython:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
@@ -124,6 +142,15 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: error
+      - name: Sync with wheels.eeems.codes
+        uses: up9cloud/action-rsync@v1.4
+        env:
+          HOST: ${{ secrets.SSH_SERVER }}
+          KEY: ${{secrets.SSH_KEY}}
+          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          USER: ${{ vars.SSH_USER }}
+          ARGS: -az
+          SOURCE: ./dist/*.whl
   rust:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
@@ -157,6 +184,15 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: error
+      - name: Sync with wheels.eeems.codes
+        uses: up9cloud/action-rsync@v1.4
+        env:
+          HOST: ${{ secrets.SSH_SERVER }}
+          KEY: ${{secrets.SSH_KEY}}
+          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          USER: ${{ vars.SSH_USER }}
+          ARGS: -az
+          SOURCE: ./dist/*.whl
   universal:
     name: ${{ matrix.package }}-py2.py3-none-any
     runs-on: ubuntu-latest
@@ -177,3 +213,12 @@ jobs:
           name: ${{ matrix.package }}-py2.py3-none-any
           path: dist
           if-no-files-found: error
+      - name: Sync with wheels.eeems.codes
+        uses: up9cloud/action-rsync@v1.4
+        env:
+          HOST: ${{ secrets.SSH_SERVER }}
+          KEY: ${{secrets.SSH_KEY}}
+          TARGET: ${{ secrets.SSH_PATH }}/${{ matrix.package }}/
+          USER: ${{ vars.SSH_USER }}
+          ARGS: -az
+          SOURCE: ./dist/*.whl
