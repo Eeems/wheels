@@ -44,35 +44,35 @@ jobs:
           path: dist
           if-no-files-found: ignore
 
-  standard-3_11:
-    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - remarkable-update-image
-          - remarkable-update-fuse
-        python:
-          - '3.12'
-          - '3.11'
-        build_on:
-          - ubuntu-amd64
-          - debian-armv7l
-    steps:
-      - name: Checkout the Git repository
-        uses: actions/checkout@v4
-      - name: Build ${{ matrix.package }}
-        uses: ./
-        with:
-          name: ${{ matrix.package }}
-          build_on: ${{ matrix.build_on }}
-          python_version: ${{ matrix.python }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-          path: dist
-          if-no-files-found: ignore
+  # standard-3_11:
+  #   name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       package:
+  #         - remarkable-update-image
+  #         - remarkable-update-fuse
+  #       python:
+  #         - '3.12'
+  #         - '3.11'
+  #       build_on:
+  #         - ubuntu-amd64
+  #         - debian-armv7l
+  #   steps:
+  #     - name: Checkout the Git repository
+  #       uses: actions/checkout@v4
+  #     - name: Build ${{ matrix.package }}
+  #       uses: ./
+  #       with:
+  #         name: ${{ matrix.package }}
+  #         build_on: ${{ matrix.build_on }}
+  #         python_version: ${{ matrix.python }}
+  #     - uses: actions/upload-artifact@v4
+  #       with:
+  #         name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+  #         path: dist
+  #         if-no-files-found: ignore
 
   wxpython:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
@@ -190,7 +190,7 @@ jobs:
     runs-on: self-hosted
     needs:
       - standard
-      - standard-3_11
+      # - standard-3_11
       - wxpython
       - rust
       - universal
@@ -202,11 +202,10 @@ jobs:
           python-version: '3.11'
       - uses: actions/download-artifact@v4
         with:
-          path: ${{ github.workspace }}/artifacts
+          path: ./artifacts
       - name: Create directories
         run: |
-          python -u create_dirs.py ${{ github.workspace }}/artifacts ${{ github.workspace }}/dist
-          ls -l ${{ github.workspace }}/dist/*
+          python -u create_dirs.py ./artifacts ./dist
       - name: Sync with wheels.eeems.codes
         uses: up9cloud/action-rsync@v1.4
         env:
@@ -215,4 +214,7 @@ jobs:
           TARGET: ${{ vars.SSH_PATH }}
           USER: ${{ vars.SSH_USER }}
           ARGS: -az
-          SOURCE: ${{ github.workspace }}/dist
+          SOURCE: ./dist
+          VERBOSE: true
+          RUN_SCRIPT_ON: source
+          PRE_SCRIPT: ls -l ./dist
