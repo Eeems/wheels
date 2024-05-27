@@ -33,6 +33,7 @@ def wheel_name(**kwargs):
 
 
 def main(name, output_dir):
+    print("Checking pypi for latest version")
     response = requests.get(f"https://pypi.org/pypi/{name}/json", timeout=30)
     if response.status_code != 200:
         raise Exception(
@@ -46,6 +47,7 @@ def main(name, output_dir):
             version = file
 
     assert version is not None
+    print("Downloading source")
     response = requests.get(version["url"], timeout=30, stream=True)
     assert response.status_code == 200
     with open("src.tar.gz", "wb") as f:
@@ -56,6 +58,7 @@ def main(name, output_dir):
         shutil.rmtree("src")
 
     os.mkdir("src")
+    print("Extracting source")
     subprocess.check_call(
         ["tar", "-xf", "src.tar.gz", "--strip-components=1", "--directory=src"]
     )
