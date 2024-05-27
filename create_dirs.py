@@ -26,7 +26,7 @@ def main(input_dir, output_dir):
 
         filepath = os.path.join(dirpath, basename)
         if not os.path.exists(filepath):
-            os.link(path, filepath)
+            os.link(os.path.join(input_dir, path), filepath)
 
         print(filepath)
 
