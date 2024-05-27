@@ -79,7 +79,7 @@ runs:
             setuptools
           cd /tmp
           echo 'Building'
-          /action/build.py "${{ inputs.name }}" "/workspace"
+          python -u /action/build.py "${{ inputs.name }}" "/workspace"
     - name: Run setup
       if: inputs.build_on == 'ubuntu-amd64'
       shell: bash
@@ -104,6 +104,6 @@ runs:
             requests \
             setuptools
         echo 'Building'
-        "${{ github.action_path }}/build.py" "${{ inputs.name }}" "${{ inputs.output_dir  }}"
+        python -u "${{ github.action_path }}/build.py" "${{ inputs.name }}" "${{ inputs.output_dir  }}"
       env:
         setup: ${{ inputs.setup }}
