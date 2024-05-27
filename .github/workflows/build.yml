@@ -86,7 +86,6 @@ jobs:
           - '3.11'
         build_on:
           - ubuntu-amd64
-          - debian-armv7l
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v4

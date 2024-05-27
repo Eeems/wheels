@@ -161,3 +161,4 @@ cython_debug/
 src.tar.gz
 src/
 *.whl
+metadata/
