@@ -68,7 +68,7 @@ jobs:
           python_version: ${{ matrix.python }}
           config_settings: |
             { "--confirm-license": "" }
-          script: |
+          setup: |
             SUDO=''
             if [ "$EUID" -ne 0 ]; then
               SUDO=sudo
