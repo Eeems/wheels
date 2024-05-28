@@ -97,7 +97,7 @@ def main(name, output_dir):
         builder.build(
             "wheel",
             output_dir,
-            config_settings=json.loads(os.environ.get("CONFIG_SETTINGS", "{}")),
+            config_settings=json.loads(os.environ.get("CONFIG_SETTINGS", "null")),
         )
         print("Done")
 
