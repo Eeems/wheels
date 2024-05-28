@@ -64,6 +64,7 @@ runs:
       env:
         src_path: ${{ inputs.output_dir }}
         CONFIG_SETTINGS: ${{ inputs.config_settings }}
+        SETUP: ${{ inputs.setup }}
         script: |
           echo 'Installing requirements'
           cat > ~/.pypirc << EOF
