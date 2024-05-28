@@ -122,7 +122,6 @@ jobs:
       matrix:
         package:
           - evdev
-          - numpy
         python:
           - '3.12'
           - '3.11'
