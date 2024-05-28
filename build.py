@@ -36,7 +36,7 @@ def wheel_name(universal=False, **kwargs):
 
 
 def debug_log(msg: str):
-    if "RUNNER_DEBUG" in os.environ:
+    if os.environ.get("RUNNER_DEBUG", "") == "1":
         print(msg)
 
 
@@ -79,16 +79,16 @@ def main(name, output_dir):
         builder = ProjectBuilder.from_isolated_env(
             env,
             "src",
-            runner=default_subprocess_runner
-            if "RUNNER_DEBUG" in os.environ
-            else quiet_subprocess_runner,
+            runner=quiet_subprocess_runner
+            if os.environ.get("RUNNER_DEBUG", "") == "1"
+            else default_subprocess_runner,
         )
         print("Installing build requirements")
         env.install(builder.build_system_requires)
         print("Installing wheel")
         env.install(builder.get_requires_for_build("wheel"))
         print("Getting wheel name")
-        universal = "UNIVERSAL" in os.environ
+        universal = os.environ.get("UNIVERSAL", "") == "1"
         wheelname = wheel_name(
             name=name,
             version=version,
