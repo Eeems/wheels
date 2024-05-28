@@ -52,6 +52,27 @@ def main(name, output_dir):
     data = response.json()
     version = data["info"]["version"]
     name = data["info"]["name"]  # Use the official name
+
+    print("Getting wheel name")
+    universal = os.environ.get("UNIVERSAL", "") == "1"
+    wheelname = wheel_name(
+        name=name,
+        version=version,
+        ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
+        universal=universal,
+    )
+    debug_log(f"Wheel Name: {wheelname}")
+    print(f"Checking if wheel exists")
+    wheelpath = os.path.join(output_dir, wheelname)
+    if (
+        requests.head(
+            f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
+        ).status_code
+        == 200
+    ):
+        print("Already exists")
+        return
+
     srctar = None
     for file in data["releases"][version]:
         if file["packagetype"] == "sdist":
@@ -87,22 +108,6 @@ def main(name, output_dir):
         env.install(builder.build_system_requires)
         print("Installing wheel")
         env.install(builder.get_requires_for_build("wheel"))
-        print("Getting wheel name")
-        universal = os.environ.get("UNIVERSAL", "") == "1"
-        wheelname = wheel_name(
-            name=name,
-            version=version,
-            ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
-            universal=universal,
-        )
-        debug_log(f"Wheel Name: {wheelname}")
-        print(f"Checking if wheel exists")
-        wheelpath = os.path.join(output_dir, wheelname)
-        url = f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
-        if requests.head(url).status_code == 200:
-            print("Already exists")
-            return
-
         print("Running setup")
         setup = os.environ.get("SETUP", "")
         debug_log(f"script:\n{setup}")
