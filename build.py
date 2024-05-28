@@ -79,9 +79,9 @@ def main(name, output_dir):
         builder = ProjectBuilder.from_isolated_env(
             env,
             "src",
-            runner=quiet_subprocess_runner
+            runner=default_subprocess_runner
             if os.environ.get("RUNNER_DEBUG", "") == "1"
-            else default_subprocess_runner,
+            else quiet_subprocess_runner,
         )
         print("Installing build requirements")
         env.install(builder.build_system_requires)
@@ -103,6 +103,8 @@ def main(name, output_dir):
             print("Already exists")
             return
 
+        print("Running setup")
+        subprocess.check_call(["bash", "-ec", os.environ.get("SETUP", "")])
         print("Building wheel")
         builder.build(
             "wheel",

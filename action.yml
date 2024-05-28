@@ -58,14 +58,13 @@ runs:
           -e RUNNER_DEBUG="$RUNNER_DEBUG" \
           -e UNIVERSAL="$UNIVERSAL" \
           -e CONFIG_SETTINGS="$CONFIG_SETTINGS" \
+          -e SETUP="$SETUP" \
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
           bash -ec "$script"
       env:
         src_path: ${{ inputs.output_dir }}
         CONFIG_SETTINGS: ${{ inputs.config_settings }}
         script: |
-          echo 'Running setup'
-          ${{ inputs.setup }}
           echo 'Installing requirements'
           cat > ~/.pypirc << EOF
             [distutils]
@@ -88,13 +87,6 @@ runs:
           cd /tmp
           echo 'Building'
           python -u /action/build.py "${{ inputs.name }}" "/workspace"
-    - name: Run setup
-      if: inputs.build_on == 'ubuntu-amd64'
-      shell: bash
-      working-directory: ${{ runner.temp }}
-      run: |
-        echo 'Running setup'
-        ${{ inputs.setup }}
     - uses: actions/setup-python@v5
       if: inputs.build_on == 'ubuntu-amd64'
       with:
@@ -125,5 +117,5 @@ runs:
         echo 'Building'
         python -u "${{ github.action_path }}/build.py" "${{ inputs.name }}" "${{ inputs.output_dir  }}"
       env:
-        setup: ${{ inputs.setup }}
+        SETUP: ${{ inputs.setup }}
         CONFIG_SETTINGS: ${{ inputs.config_settings }}
