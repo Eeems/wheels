@@ -33,6 +33,10 @@ inputs:
     description: Setup script to run building the package
     required: false
     default: ''
+  config_settings:
+    description: Extra configuration options to pass to the backend
+    required: false
+    default: ''
 runs:
   using: composite
   steps:
@@ -55,6 +59,7 @@ runs:
           bash -ec "$script"
       env:
         src_path: ${{ inputs.output_dir }}
+        CONFIG_SETTINGS: ${{ inputs.config_settings }}
         script: |
           echo 'Running setup'
           ${{ inputs.setup }}
@@ -118,3 +123,4 @@ runs:
         python -u "${{ github.action_path }}/build.py" "${{ inputs.name }}" "${{ inputs.output_dir  }}"
       env:
         setup: ${{ inputs.setup }}
+        CONFIG_SETTINGS: ${{ inputs.config_settings }}

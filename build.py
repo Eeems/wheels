@@ -3,6 +3,7 @@ import shutil
 import subprocess
 import sys
 import os
+import json
 import requests
 
 dirpath = os.path.dirname(os.path.realpath(__file__))
@@ -18,6 +19,7 @@ from setuptools import Extension
 from setuptools.dist import Distribution
 from importlib.metadata import PathDistribution
 from pyproject_hooks import quiet_subprocess_runner
+from pyproject_hooks import default_subprocess_runner
 
 
 def wheel_name(universal=False, **kwargs):
@@ -42,14 +44,15 @@ def main(name, output_dir):
         )
 
     data = response.json()
-    version = None
-    for file in data["releases"][data["info"]["version"]]:
+    version = data["info"]["version"]
+    srctar = None
+    for file in data["releases"][version]:
         if file["packagetype"] == "sdist":
-            version = file
+            srctar = file
 
-    assert version is not None
+    assert srctar is not None
     print("Downloading source")
-    response = requests.get(version["url"], timeout=30, stream=True)
+    response = requests.get(srctar["url"], timeout=30, stream=True)
     assert response.status_code == 200
     with open("src.tar.gz", "wb") as f:
         response.raw.decode_content = True
@@ -67,34 +70,35 @@ def main(name, output_dir):
         builder = ProjectBuilder.from_isolated_env(
             env,
             "src",
-            runner=quiet_subprocess_runner,
+            runner=quiet_subprocess_runner
+            if "RUNNER_DEBUG" not in os.environ
+            else default_subprocess_runner,
         )
         print("Installing build requirements")
         env.install(builder.build_system_requires)
         print("Installing wheel")
         env.install(builder.get_requires_for_build("wheel"))
-        if os.path.exists("metadata"):
-            shutil.rmtree("metadata")
-
         print("Getting metadata")
-        metadatapath = builder.metadata_path("metadata")
         print("Getting wheel name")
-        dist = PathDistribution(Path(metadatapath))
-        name = dist.name
         universal = "UNIVERSAL" in os.environ
         wheelname = wheel_name(
-            name=name,
-            version=dist.version,
+            name=name.lower(),
+            version=version,
             ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
             universal=universal,
         )
         print(f"Checking if {wheelname} exists")
         wheelpath = os.path.join(output_dir, wheelname)
         url = f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
-        if requests.head(url).status_code != 200:
-            print("Building wheel")
-            builder.build("wheel", output_dir)
+        if requests.head(url).status_code == 200:
+            print("Already exists")
 
+        print("Building wheel")
+        builder.build(
+            "wheel",
+            output_dir,
+            config_settings=json.loads(os.environ.get("CONFIG_SETTINGS", "{}")),
+        )
         print("Done")
 
 

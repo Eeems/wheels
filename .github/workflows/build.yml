@@ -44,7 +44,7 @@ jobs:
           path: dist
           if-no-files-found: ignore
 
-  arm-3_11-up:
+  pyqt5:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
     strategy:
@@ -66,6 +66,8 @@ jobs:
           name: ${{ matrix.package }}
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
+          config_settings: |
+            { "confirm-license": "" }
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
@@ -219,7 +221,7 @@ jobs:
     needs:
       - standard
       - standard-3_11-up
-      - arm-3_11-up
+      - pyqt5
       - wxpython
       - rust
       - universal
