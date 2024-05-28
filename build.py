@@ -35,9 +35,15 @@ def wheel_name(universal=False, **kwargs):
     return f"{distname}-{tag}.whl"
 
 
+def debug_log(msg: str):
+    if "RUNNER_DEBUG" in os.environ:
+        print(msg)
+
+
 def main(name, output_dir):
     print("Checking pypi for latest version")
     response = requests.get(f"https://pypi.org/pypi/{name}/json", timeout=30)
+    debug_log(f"  Response code: {response.status_code}")
     if response.status_code != 200:
         raise Exception(
             f"Failed to get https://pypi.org/pypi/{name}/json: {response.status_code}"
@@ -53,7 +59,9 @@ def main(name, output_dir):
 
     assert srctar is not None
     print("Downloading source")
+    debug_log(f"  url: {srctar['url']}")
     response = requests.get(srctar["url"], timeout=30, stream=True)
+    debug_log(f"Response code: {response.status_code}")
     assert response.status_code == 200
     with open("src.tar.gz", "wb") as f:
         response.raw.decode_content = True
@@ -71,9 +79,9 @@ def main(name, output_dir):
         builder = ProjectBuilder.from_isolated_env(
             env,
             "src",
-            runner=quiet_subprocess_runner
-            if "RUNNER_DEBUG" not in os.environ
-            else default_subprocess_runner,
+            runner=default_subprocess_runner
+            if "RUNNER_DEBUG" in os.environ
+            else quiet_subprocess_runner,
         )
         print("Installing build requirements")
         env.install(builder.build_system_requires)
@@ -87,7 +95,8 @@ def main(name, output_dir):
             ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
             universal=universal,
         )
-        print(f"Checking if {wheelname} exists")
+        debug_log(f"Wheel Name: {wheelname}")
+        print(f"Checking if wheel exists")
         wheelpath = os.path.join(output_dir, wheelname)
         url = f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
         if requests.head(url).status_code == 200:
