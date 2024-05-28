@@ -36,7 +36,7 @@ inputs:
   config_settings:
     description: Extra configuration options to pass to the backend
     required: false
-    default: ''
+    default: 'null'
 runs:
   using: composite
   steps:

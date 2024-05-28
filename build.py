@@ -92,6 +92,7 @@ def main(name, output_dir):
         url = f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
         if requests.head(url).status_code == 200:
             print("Already exists")
+            return
 
         print("Building wheel")
         builder.build(
