@@ -93,12 +93,40 @@ jobs:
         package:
           - remarkable-update-image
           - remarkable-update-fuse
-          - evdev
         python:
           - '3.12'
           - '3.11'
         build_on:
           - ubuntu-amd64
+          - debian-armv7l
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
+          python_version: ${{ matrix.python }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: ignore
+
+  arm-3_11-up:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - evdev
+          - numpy
+        python:
+          - '3.12'
+          - '3.11'
+        build_on:
           - debian-armv7l
     steps:
       - name: Checkout the Git repository
@@ -232,6 +260,7 @@ jobs:
     needs:
       - standard
       - standard-3_11-up
+      - arm-3_11-up
       # - pyqt5
       - wxpython
       - rust
