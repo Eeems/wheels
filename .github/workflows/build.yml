@@ -225,6 +225,7 @@ jobs:
       - wxpython
       - rust
       - universal
+    if: ${{ always() }}
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v4
