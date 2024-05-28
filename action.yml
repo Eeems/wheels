@@ -57,6 +57,7 @@ runs:
           -v "${{ github.action_path }}":/action \
           -e RUNNER_DEBUG="$RUNNER_DEBUG" \
           -e UNIVERSAL="$UNIVERSAL" \
+          -e CONFIG_SETTINGS="$CONFIG_SETTINGS" \
           eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
           bash -ec "$script"
       env:
