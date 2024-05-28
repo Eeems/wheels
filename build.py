@@ -104,7 +104,9 @@ def main(name, output_dir):
             return
 
         print("Running setup")
-        subprocess.check_call(["bash", "-ec", os.environ.get("SETUP", "")])
+        setup = os.environ.get("SETUP", "")
+        debug_log(f"script:\n{setup}")
+        subprocess.check_call(["bash", "-ec", setup])
         print("Building wheel")
         builder.build(
             "wheel",
