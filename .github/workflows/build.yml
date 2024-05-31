@@ -142,6 +142,54 @@ jobs:
           path: dist
           if-no-files-found: ignore
 
+  pillow:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - pillow
+        python:
+          - '3.11'
+        build_on:
+          - debian-armv7l
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v4
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
+          python_version: ${{ matrix.python }}
+          setup: |
+            SUDO=''
+            if [ "$EUID" -ne 0 ]; then
+              SUDO=sudo
+            fi
+            export DEBIAN_FRONTEND="noninteractive"
+            $SUDO apt-get -y update
+            $SUDO apt-get install -y \
+              libtiff5-dev \
+              libjpeg8-dev \
+              libopenjp2-7-dev \
+              zlib1g-dev \
+              libfreetype6-dev \
+              liblcms2-dev \
+              libwebp-dev \
+              tcl8.6-dev \
+              tk8.6-dev \
+              python3-tk \
+              libharfbuzz-dev \
+              libfribidi-dev \
+              libxcb1-dev
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: ignore
+
   wxpython:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
