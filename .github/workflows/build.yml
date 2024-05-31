@@ -309,6 +309,7 @@ jobs:
       - standard-3_11-up
       - arm-3_11-up
       # - pyqt5
+      - pillow
       - wxpython
       - rust
       - universal
