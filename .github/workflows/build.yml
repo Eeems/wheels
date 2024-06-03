@@ -267,7 +267,7 @@ jobs:
               pkg-config \
               python3-pip \
               python3-dev \
-              ninja
+              cmake
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
