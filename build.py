@@ -14,10 +14,8 @@ from build import ProjectBuilder
 from build.env import DefaultIsolatedEnv
 from build.env import Installer
 
-from pathlib import Path
 from setuptools import Extension
 from setuptools.dist import Distribution
-from importlib.metadata import PathDistribution
 from pyproject_hooks import quiet_subprocess_runner
 from pyproject_hooks import default_subprocess_runner
 
@@ -62,8 +60,7 @@ def main(name, output_dir):
         universal=universal,
     )
     debug_log(f"Wheel Name: {wheelname}")
-    print(f"Checking if wheel exists")
-    wheelpath = os.path.join(output_dir, wheelname)
+    print("Checking if wheel exists")
     if (
         requests.head(
             f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
@@ -104,13 +101,13 @@ def main(name, output_dir):
             if os.environ.get("RUNNER_DEBUG", "") == "1"
             else quiet_subprocess_runner,
         )
-        print("Installing build requirements")
+        print("Installing build system requirements")
         env.install(builder.build_system_requires)
         print("Running setup")
         setup = os.environ.get("SETUP", "")
         debug_log(f"script:\n{setup}")
         subprocess.check_call(["bash", "-ec", setup])
-        print("Installing wheel requirements")
+        print("Installing requirements to build wheel")
         env.install(builder.get_requires_for_build("wheel"))
         print("Building wheel")
         builder.build(
