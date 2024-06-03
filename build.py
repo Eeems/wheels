@@ -106,12 +106,12 @@ def main(name, output_dir):
         )
         print("Installing build requirements")
         env.install(builder.build_system_requires)
-        print("Installing wheel")
-        env.install(builder.get_requires_for_build("wheel"))
         print("Running setup")
         setup = os.environ.get("SETUP", "")
         debug_log(f"script:\n{setup}")
         subprocess.check_call(["bash", "-ec", setup])
+        print("Installing wheel requirements")
+        env.install(builder.get_requires_for_build("wheel"))
         print("Building wheel")
         builder.build(
             "wheel",
