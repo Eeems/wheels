@@ -6,18 +6,57 @@ import os
 import json
 import requests
 
+from contextlib import AbstractContextManager
+
 dirpath = os.path.dirname(os.path.realpath(__file__))
 if dirpath in sys.path:
     sys.path.remove(dirpath)
 
-from build import ProjectBuilder
-from build.env import DefaultIsolatedEnv
-from build.env import Installer
+from build import ProjectBuilder  # noqa: E402
+from build.env import DefaultIsolatedEnv  # noqa: E402
+from build.env import Installer  # noqa: E402
 
-from setuptools import Extension
-from setuptools.dist import Distribution
-from pyproject_hooks import quiet_subprocess_runner
-from pyproject_hooks import default_subprocess_runner
+from setuptools import Extension  # noqa: E402
+from setuptools.dist import Distribution  # noqa: E402
+from pyproject_hooks import quiet_subprocess_runner  # noqa: E402
+from pyproject_hooks import default_subprocess_runner  # noqa: E402
+
+
+class BashRunnerWithSharedEnvironment(AbstractContextManager):
+    # https://stackoverflow.com/a/68339760
+    def __init__(self, env=None):
+        if env is None:
+            env = dict(os.environ)
+        self.env: dict[str, str] = env
+        self._fd_read, self._fd_write = os.pipe()
+
+    def run(self, cmd, **opts):
+        if self._fd_read is None:
+            raise RuntimeError("BashRunner is already closed")
+        write_env_pycode = ";".join(
+            [
+                "import os",
+                "import json",
+                f"os.write({self._fd_write}, json.dumps(dict(os.environ)).encode())",
+            ]
+        )
+        write_env_shell_cmd = f"{sys.executable} -c '{write_env_pycode}'"
+        cmd += "\n" + write_env_shell_cmd
+        result = subprocess.run(
+            ["bash", "-ce", cmd], pass_fds=[self._fd_write], env=self.env, **opts
+        )
+        self.env = json.loads(os.read(self._fd_read, 5000).decode())
+        return result
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self._fd_read:
+            os.close(self._fd_read)
+            os.close(self._fd_write)
+            self._fd_read = None
+            self._fd_write = None
+
+    def __del__(self):
+        self.__exit__(None, None, None)
 
 
 def wheel_name(universal=False, **kwargs):
@@ -103,10 +142,15 @@ def main(name, output_dir):
         )
         print("Installing build system requirements")
         env.install(builder.build_system_requires)
-        print("Running setup")
         setup = os.environ.get("SETUP", "")
-        debug_log(f"script:\n{setup}")
-        subprocess.check_call(["bash", "-ec", setup])
+        if setup:
+            print("Running setup")
+            debug_log(f"script:\n{setup}")
+            with BashRunnerWithSharedEnvironment() as runner:
+                runner.run(setup, stdout=subprocess.PIPE)
+                for key, value in runner.env.items():
+                    os.environ[key] = value
+
         print("Installing requirements to build wheel")
         env.install(builder.get_requires_for_build("wheel"))
         print("Building wheel")
