@@ -45,7 +45,7 @@ class BashRunnerWithSharedEnvironment(AbstractContextManager):
         result = subprocess.run(
             ["bash", "-ce", cmd], pass_fds=[self._fd_write], env=self.env, **opts
         )
-        self.env = json.loads(os.read(self._fd_read, 5000).decode())
+        self.env = json.loads(os.read(self._fd_read).decode())
         return result
 
     def __exit__(self, exc_type, exc_value, traceback):
