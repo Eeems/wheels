@@ -27,12 +27,14 @@ class BashRunnerWithSharedEnvironment(AbstractContextManager):
     def __init__(self, env=None):
         if env is None:
             env = dict(os.environ)
+
         self.env: dict[str, str] = env
         self._fd_read, self._fd_write = os.pipe()
 
     def run(self, cmd, **opts):
         if self._fd_read is None:
             raise RuntimeError("BashRunner is already closed")
+
         write_env_pycode = ";".join(
             [
                 "import os",
@@ -45,7 +47,7 @@ class BashRunnerWithSharedEnvironment(AbstractContextManager):
         result = subprocess.run(
             ["bash", "-ce", cmd], pass_fds=[self._fd_write], env=self.env, **opts
         )
-        self.env = json.loads(os.read(self._fd_read).decode())
+        self.env = json.loads(os.read(self._fd_read, os.fstat(self._fd_read).st_size).decode())
         return result
 
     def __exit__(self, exc_type, exc_value, traceback):
