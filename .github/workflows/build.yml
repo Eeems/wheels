@@ -6,7 +6,7 @@ on:
   pull_request:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * *'
+    - cron: "0 0 * * *"
 permissions: read-all
 jobs:
   standard:
@@ -23,23 +23,23 @@ jobs:
           - zstandard
           - pynacl
         python:
-          - '3.13'
-          - '3.12'
-          - '3.11'
-          - '3.10'
+          - "3.13"
+          - "3.12"
+          - "3.11"
+          - "3.10"
         build_on:
           - ubuntu-amd64
           - debian-armv7l
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
         uses: ./
         with:
           name: ${{ matrix.package }}
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -61,7 +61,7 @@ jobs:
   #         - debian-armv7l
   #   steps:
   #     - name: Checkout the Git repository
-  #       uses: actions/checkout@v4
+  #       uses: actions/checkout@v6
   #     - name: Build ${{ matrix.package }}
   #       uses: ./
   #       with:
@@ -80,7 +80,7 @@ jobs:
   #           $SUDO apt-get install -y \
   #             qtbase5-dev \
   #             qt5-qmake
-  #     - uses: actions/upload-artifact@v4
+  #     - uses: actions/upload-artifact@v6
   #       with:
   #         name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
   #         path: dist
@@ -96,22 +96,22 @@ jobs:
           - remarkable-update-image
           - remarkable-update-fuse
         python:
-          - '3.13'
-          - '3.12'
-          - '3.11'
+          - "3.13"
+          - "3.12"
+          - "3.11"
         build_on:
           - ubuntu-amd64
           - debian-armv7l
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
         uses: ./
         with:
           name: ${{ matrix.package }}
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -126,21 +126,21 @@ jobs:
         package:
           - evdev
         python:
-          - '3.13'
-          - '3.12'
-          - '3.11'
+          - "3.13"
+          - "3.12"
+          - "3.11"
         build_on:
           - debian-armv7l
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
         uses: ./
         with:
           name: ${{ matrix.package }}
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -155,12 +155,12 @@ jobs:
         package:
           - pillow
         python:
-          - '3.11'
+          - "3.11"
         build_on:
           - debian-armv7l
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
         uses: ./
         with:
@@ -188,7 +188,7 @@ jobs:
               libharfbuzz-dev \
               libfribidi-dev \
               libxcb1-dev
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -202,14 +202,14 @@ jobs:
         package:
           - ninja
         python:
-          - '3.13'
-          - '3.12'
-          - '3.11'
+          - "3.13"
+          - "3.12"
+          - "3.11"
         build_on:
           - debian-armv7l
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
         uses: ./
         with:
@@ -228,7 +228,7 @@ jobs:
               python3-pip \
               python3-dev \
               cmake
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -243,14 +243,14 @@ jobs:
         package:
           - numpy
         python:
-          - '3.13'
-          - '3.12'
-          - '3.11'
+          - "3.13"
+          - "3.12"
+          - "3.11"
         build_on:
           - debian-armv7l
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
         uses: ./
         with:
@@ -274,7 +274,7 @@ jobs:
               python3-pip \
               python3-dev \
               cmake
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -289,14 +289,14 @@ jobs:
         package:
           - wxpython
         python:
-          - '3.13'
-          - '3.12'
-          - '3.11'
+          - "3.13"
+          - "3.12"
+          - "3.11"
         build_on:
           - ubuntu-amd64
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
         uses: ./
         with:
@@ -328,7 +328,7 @@ jobs:
               libwebkit2gtk-4.1-dev \
               libxtst-dev \
               libunwind-dev
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -344,16 +344,16 @@ jobs:
           - cryptography
           - bcrypt
         python:
-          - '3.13'
-          - '3.12'
-          - '3.11'
-          - '3.10'
+          - "3.13"
+          - "3.12"
+          - "3.11"
+          - "3.10"
         build_on:
           - ubuntu-amd64
           - debian-armv7l
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
         uses: ./
         with:
@@ -363,7 +363,7 @@ jobs:
           setup: |
             curl https://sh.rustup.rs -sSf | sh -s -- -y
             source ~/.cargo/env
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
@@ -379,14 +379,14 @@ jobs:
           - exodus-bundler
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
         uses: ./
         with:
           name: ${{ matrix.package }}
         env:
           UNIVERSAL: 1
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py2.py3-none-any
           path: dist
@@ -410,11 +410,11 @@ jobs:
     if: ${{ always() }}
     steps:
       - name: Checkout the Git repository
-        uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+        uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
         with:
-          python-version: '3.11'
-      - uses: actions/download-artifact@v4
+          python-version: "3.11"
+      - uses: actions/download-artifact@v8
         with:
           path: ./artifacts
       - name: Create directories

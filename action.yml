@@ -1,4 +1,4 @@
-name: 'Build wheel for pypi package'
+name: "Build wheel for pypi package"
 description: Build a wheel for a pypi package
 author: Eeems
 branding:
@@ -15,18 +15,18 @@ inputs:
   python_version:
     description: Python version to use
     required: false
-    default: '3.13'
+    default: "3.13"
     type: choice
     options:
-      - '3.13'
-      - '3.12'
-      - '3.11'
-      - '3.10'
-      - '3.9'
+      - "3.13"
+      - "3.12"
+      - "3.11"
+      - "3.10"
+      - "3.9"
   build_on:
     description: Build target to use
     required: false
-    default: 'ubuntu-amd64'
+    default: "ubuntu-amd64"
     type: choice
     options:
       - ubuntu-amd64
@@ -34,20 +34,20 @@ inputs:
   setup:
     description: Setup script to run building the package
     required: false
-    default: ''
+    default: ""
   config_settings:
     description: Extra configuration options to pass to the backend
     required: false
-    default: 'null'
+    default: "null"
 runs:
   using: composite
   steps:
     - name: Set up QEMU
       if: inputs.build_on == 'debian-armv7l'
-      uses: docker/setup-qemu-action@v3
+      uses: docker/setup-qemu-action@v4
     - name: Set up Docker Buildx
       if: inputs.build_on == 'debian-armv7l'
-      uses: docker/setup-buildx-action@v3
+      uses: docker/setup-buildx-action@v4
     - name: Build Wheel
       if: inputs.build_on == 'debian-armv7l'
       shell: bash
@@ -90,7 +90,7 @@ runs:
           cd /tmp
           echo 'Building'
           python -u /action/build.py "${{ inputs.name }}" "/workspace"
-    - uses: actions/setup-python@v5
+    - uses: actions/setup-python@v6
       if: inputs.build_on == 'ubuntu-amd64'
       with:
         python-version: ${{ inputs.python_version }}
