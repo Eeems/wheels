@@ -386,8 +386,18 @@ jobs:
           - "3.11"
           - "3.10"
         build_on:
-          - ubuntu-amd64
-          - debian-armv7l
+          - manylinux-armv7l-glibc
+          - manylinux-armv7l-musl
+          - manylinux-aarch64-glibc
+          - manylinux-aarch64-musl
+          - manylinux-x86_64-glibc
+          - manylinux-x86_64-musl
+          - manylinux-s390x-glibc
+          - manylinux-s390x-musl
+          - manylinux-ppc64le-glibc
+          - manylinux-ppc64le-musl
+          - manylinux-riscv64-glibc
+          - manylinux-riscv64-musl
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v6

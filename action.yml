@@ -18,6 +18,7 @@ inputs:
     default: "3.13"
     type: choice
     options:
+      - "3.14"
       - "3.13"
       - "3.12"
       - "3.11"
@@ -31,6 +32,20 @@ inputs:
     options:
       - ubuntu-amd64
       - debian-armv7l
+      - manylinux-armv7l-glibc
+      - manylinux-armv7l-musl
+      - manylinux-aarch64-glibc
+      - manylinux-aarch64-musl
+      - manylinux-x86_64-glibc
+      - manylinux-x86_64-musl
+      - manylinux-i686-glibc
+      - manylinux-i686-musl
+      - manylinux-s390x-glibc
+      - manylinux-s390x-musl
+      - manylinux-ppc64le-glibc
+      - manylinux-ppc64le-musl
+      - manylinux-riscv64-glibc
+      - manylinux-riscv64-musl
   setup:
     description: Setup script to run building the package
     required: false
@@ -43,11 +58,72 @@ runs:
   using: composite
   steps:
     - name: Set up QEMU
-      if: inputs.build_on == 'debian-armv7l'
+      if: inputs.build_on == 'debian-armv7l' || startsWith(inputs.build_on, 'manylinux-')
       uses: docker/setup-qemu-action@v4
-    - name: Set up Docker Buildx
-      if: inputs.build_on == 'debian-armv7l'
-      uses: docker/setup-buildx-action@v4
+    - name: Build Wheel
+      if: startsWith(inputs.build_on, 'manylinux-')
+      shell: bash
+      run: |
+        set -e
+        if [ -n "$RUNNER_DEBUG" ];then
+          set -x
+        fi
+        arch=$(echo "${{inputs.build_on }}" | cut -d'-' -f2)
+        if [[ "${{ inputs.build_on }}" == *"-musl" ]];then
+          image="musllinux_1_2_$arch"
+        elif [[ "$arch" == "armv7l" ]];then
+          image="manylinux_2_35_$arch"
+        elif [[ "$arch" == "riscv64" ]];then
+          image="manylinux_2_39_$arch"
+        else
+          image="manylinux_2_34_$arch"
+        fi
+        docker run \
+          --privileged \
+          --rm \
+          tonistiigi/binfmt --install all
+        docker run \
+          --rm \
+          -v "${src_path}":/workspace \
+          -v "${{ github.action_path }}":/action \
+          -e RUNNER_DEBUG="$RUNNER_DEBUG" \
+          -e CONFIG_SETTINGS="$CONFIG_SETTINGS" \
+          -e SETUP="$SETUP" \
+          quay.io/pypa/"$image":latest \
+          bash -ec "$script"
+      env:
+        src_path: ${{ inputs.output_dir }}
+        CONFIG_SETTINGS: ${{ inputs.config_settings }}
+        SETUP: ${{ inputs.setup }}
+        script: |
+          echo 'Installing requirements'
+          python=${{ inputs.python_version }}
+          python_interpreter=cp${python//./}-cp${python//./}
+          manylinux-interpreters ensure "${python_interpreter}";
+          PATH="/opt/python/${python_interpreter}/bin:\$PATH";
+          cat > ~/.pypirc << EOF
+            [distutils]
+            index-servers =
+                pypi
+                eeems
+
+            [pypi]
+
+            [eeems]
+            repository = https://wheels.eeems.codes/
+          EOF
+          pip install --upgrade \
+            pip \
+            wheel \
+            build \
+            requests \
+            setuptools
+          cd /tmp
+          echo 'Building'
+          python -u /action/build.py "${{ inputs.name }}" "/workspace"
+          auditwheel repair dist/*.whl;
+          rm -r dist/
+          mv wheelhouse/ dist/
     - name: Build Wheel
       if: inputs.build_on == 'debian-armv7l'
       shell: bash
