@@ -96,11 +96,14 @@ runs:
         CONFIG_SETTINGS: ${{ inputs.config_settings }}
         SETUP: ${{ inputs.setup }}
         script: |
+          if [ -n "$RUNNER_DEBUG" ];then
+            set -x
+          fi
           echo 'Installing requirements'
           python=${{ inputs.python_version }}
           python_interpreter=cp${python//./}-cp${python//./}
-          manylinux-interpreters ensure "${python_interpreter}";
-          PATH="/opt/python/${python_interpreter}/bin:\$PATH";
+          manylinux-interpreters ensure "${python_interpreter}"
+          PATH="/opt/python/${python_interpreter}/bin:$PATH"
           cat > ~/.pypirc << EOF
             [distutils]
             index-servers =
@@ -121,7 +124,7 @@ runs:
           cd /tmp
           echo 'Building'
           python -u /action/build.py "${{ inputs.name }}" "/workspace"
-          auditwheel repair dist/*.whl;
+          auditwheel repair dist/*.whl
           rm -r dist/
           mv wheelhouse/ dist/
     - name: Build Wheel
