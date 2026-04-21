@@ -6,6 +6,7 @@ import shutil
 import subprocess
 import sys
 from contextlib import AbstractContextManager
+from glob import iglob
 
 dirpath = os.path.dirname(os.path.realpath(__file__))
 if dirpath in sys.path:
@@ -95,7 +96,7 @@ class BashRunnerWithSharedEnvironment(AbstractContextManager):
         self.__exit__(None, None, None)
 
 
-def wheel_name(universal=False, **kwargs):
+def wheel_name(universal: bool = False, manylinux: str | None = None, **kwargs):
     # create a fake distribution from arguments
     dist = Distribution(attrs=kwargs)
     # finalize bdist_wheel command
@@ -106,10 +107,10 @@ def wheel_name(universal=False, **kwargs):
     distname = bdist_wheel_cmd.wheel_dist_name
     tag = "-".join(bdist_wheel_cmd.get_tag())
     name = f"{distname}-{tag}.whl"
-    if "MANYLINUX" not in os.environ:
-        return name
+    if manylinux is not None:
+        return f"{name.split('-linux_', 1)[0]}-{manylinux}.whl"
 
-    return f"{name.split('-linux_', 1)[0]}-{os.environ['MANYLINUX']}.whl"
+    return name
 
 
 def debug_log(msg: str):
@@ -117,7 +118,7 @@ def debug_log(msg: str):
         print(msg)
 
 
-def main(name, output_dir):
+def main(name: str, output_dir: str):
     print("Checking pypi for latest version")
     response = requests.get(f"https://pypi.org/pypi/{name}/json", timeout=30)
     debug_log(f"  Response code: {response.status_code}")
@@ -137,6 +138,7 @@ def main(name, output_dir):
         version=version,
         ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
         universal=universal,
+        manylinux=os.environ.get("MANYLINUX", None),
     )
     print(f"Wheel Name: {wheelname}")
     if not os.environ.get("FORCE", ""):
@@ -200,7 +202,22 @@ def main(name, output_dir):
                 os.environ.get("CONFIG_SETTINGS", "null") or "null"
             ),
         )
-        if not os.path.exists(os.path.join(output_dir, wheelname)):
+        wheelpath = os.path.join(output_dir, wheelname)
+        if "MANYLINUX" in os.environ and not os.path.exists(wheelpath):
+            nativewheelname = wheel_name(
+                name=name,
+                version=version,
+                ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
+                universal=universal,
+                manylinux=os.environ.get("MANYLINUX", None),
+            )
+            nativewheelpath = os.path.join(output_dir, nativewheelname)
+            chronic("auditwheel", "repair", nativewheelpath)
+            os.unlink(nativewheelpath)
+            os.rename(os.path.join("wheelhouse", wheelname), wheelpath)
+            shutil.rmtree("wheelhouse")
+
+        if not os.path.exists(wheelpath):
             print("WARNING: Wheel not found, name must not match", file=sys.stderr)
 
         print("Done")

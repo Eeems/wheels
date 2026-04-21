@@ -120,11 +120,6 @@ runs:
           cd /tmp
           echo 'Building'
           python -u /action/build.py "${{ inputs.name }}" "/workspace"
-          if [ -f /workspace/*.whl ];then
-            auditwheel repair /workspace/*.whl
-            rm -f /workspace/*.whl
-            mv wheelhouse/*.whl /workspace/
-          fi
     - name: Build Wheel
       if: inputs.build_on == 'debian-armv7l'
       shell: bash
