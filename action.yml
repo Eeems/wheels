@@ -115,14 +115,6 @@ runs:
             [eeems]
             repository = https://wheels.eeems.codes/
           EOF
-          pip install \
-            --upgrade \
-            --root-user-action=ignore \
-            pip \
-            wheel \
-            build \
-            requests \
-            setuptools
           cd /tmp
           echo 'Building'
           python -u /action/build.py "${{ inputs.name }}" "/workspace"
@@ -164,12 +156,6 @@ runs:
             repository = https://wheels.eeems.codes/
           EOF
           source /opt/lib/nuitka/bin/activate
-          pip install --upgrade \
-            pip \
-            wheel \
-            build \
-            requests \
-            setuptools
           cd /tmp
           echo 'Building'
           python -u /action/build.py "${{ inputs.name }}" "/workspace"
@@ -194,12 +180,6 @@ runs:
           [eeems]
           repository = https://wheels.eeems.codes/
         EOF
-        pip install --upgrade \
-            pip \
-            wheel \
-            build \
-            requests \
-            setuptools
         echo 'Building'
         python -u "${{ github.action_path }}/build.py" "${{ inputs.name }}" "${{ inputs.output_dir  }}"
       env:

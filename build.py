@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import argparse
 import json
 import os
 import shutil
@@ -6,12 +7,39 @@ import subprocess
 import sys
 from contextlib import AbstractContextManager
 
-import requests
-
 dirpath = os.path.dirname(os.path.realpath(__file__))
 if dirpath in sys.path:
     sys.path.remove(dirpath)
 
+
+def chronic(*args: str) -> None:
+    proc = subprocess.run(args, check=False, capture_output=True, text=True)
+    if proc.returncode:
+        print(proc.stdout)
+        print(proc.stderr, file=sys.stderr)
+        raise subprocess.CalledProcessError(
+            proc.returncode,
+            proc.args,  # pyright: ignore[reportAny]
+            proc.stdout,
+            proc.stderr,
+        )
+
+
+chronic(sys.executable, "-um", "ensurepip")
+chronic(
+    sys.executable,
+    "-um",
+    "pip",
+    "install",
+    "--upgrade",
+    "pip",
+    "wheel",
+    "build",
+    "requests",
+    "setuptools",
+)
+
+import requests
 from build import ProjectBuilder  # noqa: E402
 from build.env import (
     DefaultIsolatedEnv,  # noqa: E402
@@ -48,7 +76,10 @@ class BashRunnerWithSharedEnvironment(AbstractContextManager):
         write_env_shell_cmd = f"{sys.executable} -c '{write_env_pycode}'"
         cmd += "\n" + write_env_shell_cmd
         result = subprocess.run(
-            ["bash", "-ce", cmd], pass_fds=[self._fd_write], env=self.env, **opts
+            ["bash", "-ce", cmd],
+            pass_fds=[self._fd_write],
+            env=self.env,
+            **opts,
         )
         self.env = json.loads(os.read(self._fd_read, 10000).decode())
         return result
@@ -135,9 +166,7 @@ def main(name, output_dir):
 
     os.mkdir("src")
     print("Extracting source")
-    subprocess.check_call(
-        ["tar", "-xf", "src.tar.gz", "--strip-components=1", "--directory=src"]
-    )
+    chronic("tar", "-xf", "src.tar.gz", "--strip-components=1", "--directory=src")
     with DefaultIsolatedEnv(installer=Installer) as env:
         builder = ProjectBuilder.from_isolated_env(
             env,
@@ -170,4 +199,8 @@ def main(name, output_dir):
         print("Done")
 
 
-main(sys.argv[1], sys.argv[2])
+parser = argparse.ArgumentParser()
+_ = parser.add_argument("name")
+_ = parser.add_argument("output_dir")
+args = parser.parse_args()
+main(args.name, args.output_dir)  # pyright: ignore[reportAny]
