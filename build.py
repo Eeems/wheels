@@ -1,25 +1,28 @@
 #!/usr/bin/env python
+import json
+import os
 import shutil
 import subprocess
 import sys
-import os
-import json
-import requests
-
 from contextlib import AbstractContextManager
+
+import requests
 
 dirpath = os.path.dirname(os.path.realpath(__file__))
 if dirpath in sys.path:
     sys.path.remove(dirpath)
 
 from build import ProjectBuilder  # noqa: E402
-from build.env import DefaultIsolatedEnv  # noqa: E402
-from build.env import Installer  # noqa: E402
-
+from build.env import (
+    DefaultIsolatedEnv,  # noqa: E402
+    Installer,  # noqa: E402
+)
+from pyproject_hooks import (
+    default_subprocess_runner,  # noqa: E402
+    quiet_subprocess_runner,  # noqa: E402
+)
 from setuptools import Extension  # noqa: E402
 from setuptools.dist import Distribution  # noqa: E402
-from pyproject_hooks import quiet_subprocess_runner  # noqa: E402
-from pyproject_hooks import default_subprocess_runner  # noqa: E402
 
 
 class BashRunnerWithSharedEnvironment(AbstractContextManager):
@@ -159,7 +162,9 @@ def main(name, output_dir):
         builder.build(
             "wheel",
             output_dir,
-            config_settings=json.loads(os.environ.get("CONFIG_SETTINGS", "null")),
+            config_settings=json.loads(
+                os.environ.get("CONFIG_SETTINGS", "null") or "null"
+            ),
         )
         print("Done")
 

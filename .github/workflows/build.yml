@@ -408,9 +408,23 @@ jobs:
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
           setup: |
-            rm -f /root/.rustup/settings.toml
-            curl https://sh.rustup.rs -sSf | sh -s -- -y
-            source ~/.cargo/env
+            if command -v apt-get >/dev/null; then
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y \
+                rustc \
+                cargo \
+                libssl-dev
+            elif command -v apk >/dev/null;then
+              apk add --no-cache \
+                rust \
+                cargo \
+                openssl-dev
+            elif command -v dnf >/dev/null;then
+              dnf install -y \
+                rustc \
+                cargo \
+                openssl-devel
+            fi
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}

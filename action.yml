@@ -115,7 +115,9 @@ runs:
             [eeems]
             repository = https://wheels.eeems.codes/
           EOF
-          pip install --upgrade \
+          pip install \
+            --upgrade \
+            --root-user-action=ignore \
             pip \
             wheel \
             build \
@@ -125,8 +127,8 @@ runs:
           echo 'Building'
           python -u /action/build.py "${{ inputs.name }}" "/workspace"
           auditwheel repair dist/*.whl
-          rm -r dist/
-          mv wheelhouse/ dist/
+          rm -f dist/*.whl
+          mv wheelhouse/*.whl dist/
     - name: Build Wheel
       if: inputs.build_on == 'debian-armv7l'
       shell: bash
