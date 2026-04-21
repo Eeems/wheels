@@ -105,7 +105,11 @@ def wheel_name(universal=False, **kwargs):
     # assemble wheel file name
     distname = bdist_wheel_cmd.wheel_dist_name
     tag = "-".join(bdist_wheel_cmd.get_tag())
-    return f"{distname}-{tag}.whl"
+    name = f"{distname}-{tag}.whl"
+    if "MANYLINUX" not in os.environ:
+        return name
+
+    return f"{name.split('-linux_', 1)[0]}-{os.environ['MANYLINUX']}.whl"
 
 
 def debug_log(msg: str):

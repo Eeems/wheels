@@ -87,6 +87,8 @@ runs:
           -v "${src_path}":/workspace \
           -v "${{ github.action_path }}":/action \
           -e RUNNER_DEBUG="$RUNNER_DEBUG" \
+          -e UNIVERSAL="$UNIVERSAL" \
+          -e MANYLINUX="$image" \
           -e CONFIG_SETTINGS="$CONFIG_SETTINGS" \
           -e SETUP="$SETUP" \
           quay.io/pypa/"$image":latest \
