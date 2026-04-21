@@ -209,11 +209,14 @@ def main(name: str, output_dir: str):
                 version=version,
                 ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
                 universal=universal,
-                manylinux=os.environ.get("MANYLINUX", None),
             )
-            nativewheelpath = os.path.join(output_dir, nativewheelname)
-            chronic("auditwheel", "repair", nativewheelpath)
-            os.unlink(nativewheelpath)
+            nativewheel = next(iglob(f"{output_dir}/*.whl"), None)
+            if nativewheel is None:
+                raise FileNotFoundException("No wheel found")
+
+            print("Repairing wheel")
+            chronic("auditwheel", "repair", nativewheel)
+            os.unlink(nativewheel)
             os.rename(os.path.join("wheelhouse", wheelname), wheelpath)
             shutil.rmtree("wheelhouse")
 
