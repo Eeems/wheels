@@ -104,15 +104,16 @@ def main(name, output_dir):
         universal=universal,
     )
     debug_log(f"Wheel Name: {wheelname}")
-    print("Checking if wheel exists")
-    if (
-        requests.head(
-            f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
-        ).status_code
-        == 200
-    ):
-        print("Already exists")
-        return
+    if not os.environ.get("FORCE", ""):
+        print("Checking if wheel exists")
+        if (
+            requests.head(
+                f"https://wheels.eeems.codes/{name.lower()}/{wheelname}"
+            ).status_code
+            == 200
+        ):
+            print("Already exists")
+            return
 
     srctar = None
     for file in data["releases"][version]:
