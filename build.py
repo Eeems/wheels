@@ -134,7 +134,7 @@ def main(name, output_dir):
         ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
         universal=universal,
     )
-    debug_log(f"Wheel Name: {wheelname}")
+    print(f"Wheel Name: {wheelname}")
     if not os.environ.get("FORCE", ""):
         print("Checking if wheel exists")
         if (
@@ -196,6 +196,9 @@ def main(name, output_dir):
                 os.environ.get("CONFIG_SETTINGS", "null") or "null"
             ),
         )
+        if not os.path.exists(os.path.join(output_dir, wheelname)):
+            print("WARNING: Wheel not found, name must not match", file=sys.stderr)
+
         print("Done")
 
 
