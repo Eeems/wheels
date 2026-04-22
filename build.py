@@ -216,7 +216,7 @@ def main(name: str, output_dir: str):
                 os.environ.get("CONFIG_SETTINGS", "null") or "null"
             ),
         )
-        if "MANYLINUX" in os.environ:
+        if os.environ.get("MANYLINUX", ""):
             print("Repairing wheel(s)")
             chronic("auditwheel", "repair", native_wheel_path)
             os.unlink(native_wheel_path)
