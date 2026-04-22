@@ -180,7 +180,7 @@ def main(name: str, output_dir: str) -> None:
         for wheelname in wheelnames:
             if (
                 requests.head(
-                    f"https://wheels.eeems.codes/{name.lower()}/{wheelname}",
+                    f"https://wheels.eeems.codes/{name.lower().replace('-', '_')}/{wheelname}",
                     timeout=20,
                 ).status_code
                 == 200
