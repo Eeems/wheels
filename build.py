@@ -51,7 +51,7 @@ from setuptools import Extension  # noqa: E402
 from setuptools.dist import Distribution  # noqa: E402
 
 
-class BashRunnerWithSharedEnvironment(AbstractContextManager):
+class BashRunnerWithSharedEnvironment(AbstractContextManager):  # pyright: ignore[reportMissingTypeArgument]
     # https://stackoverflow.com/a/68339760
     def __init__(self, env=None):  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType]  # noqa: ANN204
         if env is None:
@@ -71,10 +71,12 @@ class BashRunnerWithSharedEnvironment(AbstractContextManager):
                 f"os.write({self._fd_write}, json.dumps(dict(os.environ)).encode())",
             ]
         )
-        write_env_shell_cmd = f"{sys.executable} -c '{write_env_pycode}'"
-        cmd += "\n" + write_env_shell_cmd  # pyright: ignore[reportUnknownVariableType]
         result = subprocess.run(  # noqa: PLW1510  # pyright: ignore[reportCallIssue, reportUnknownVariableType]
-            ["bash", "-ce", cmd],
+            [
+                "bash",
+                "-ce",
+                f"trap \"{sys.executable} -c '{write_env_pycode}'\" EXIT\n{cmd}",
+            ],
             pass_fds=[self._fd_write],  # pyright: ignore[reportArgumentType]
             env=self.env,
             **opts,
@@ -82,7 +84,7 @@ class BashRunnerWithSharedEnvironment(AbstractContextManager):
         self.env = json.loads(os.read(self._fd_read, 10000).decode())
         return result  # pyright: ignore[reportUnknownVariableType]
 
-    def __exit__(self, exc_type, exc_value, traceback):  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType]
+    def __exit__(self, exc_type, exc_value, traceback):  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType, reportImplicitOverride]  # noqa: ANN204
         if self._fd_read:
             os.close(self._fd_read)
             os.close(self._fd_write)  # pyright: ignore[reportArgumentType]
