@@ -63,7 +63,7 @@ def main():
 
             image = f"eeems/nuitka-arm-builder:bullseye-{args.python}"
             platform = "linux/arm/v7"
-            script.append("source /opt/lib/nuitka/bin/activate")
+            script.append(". /opt/lib/nuitka/bin/activate")
 
         case "manylinux":
             parts = args.build_on.split("-", 2)
