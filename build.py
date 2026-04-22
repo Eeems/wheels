@@ -7,6 +7,7 @@ import subprocess
 import sys
 from contextlib import AbstractContextManager
 from glob import iglob
+from platform import uname
 
 dirpath = os.path.dirname(os.path.realpath(__file__))
 if dirpath in sys.path:
@@ -105,6 +106,9 @@ def wheel_name(universal: bool = False, manylinux: str | None = None, **kwargs):
     # assemble wheel file name
     distname = bdist_wheel_cmd.wheel_dist_name
     tag = "-".join(bdist_wheel_cmd.get_tag())
+    if tag.endswith("-"):
+        tag += f"linux_{uname().machine}"
+
     name = f"{distname}-{tag}.whl"
     if manylinux is not None:
         return f"{name.split('-linux_', 1)[0]}-{manylinux}.whl"
