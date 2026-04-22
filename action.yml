@@ -58,127 +58,21 @@ runs:
   using: composite
   steps:
     - name: Set up QEMU
-      if: inputs.build_on == 'debian-armv7l' || startsWith(inputs.build_on, 'manylinux-')
+      if: inputs.build_on != 'ubuntu-amd64'
       uses: docker/setup-qemu-action@v4
-    - name: Build Wheel
-      if: startsWith(inputs.build_on, 'manylinux-')
-      shell: bash
-      run: |
-        set -e
-        if [ -n "$RUNNER_DEBUG" ];then
-          set -x
-        fi
-        arch=$(echo "${{inputs.build_on }}" | cut -d'-' -f2)
-        if [[ "${{ inputs.build_on }}" == *"-musl" ]];then
-          image="musllinux_1_2_$arch"
-        elif [[ "$arch" == "armv7l" ]];then
-          image="manylinux_2_35_$arch"
-        elif [[ "$arch" == "riscv64" ]];then
-          image="manylinux_2_39_$arch"
-        else
-          image="manylinux_2_34_$arch"
-        fi
-        docker run \
-          --privileged \
-          --rm \
-          tonistiigi/binfmt --install all
-        docker run \
-          --rm \
-          -v "${src_path}":/workspace \
-          -v "${{ github.action_path }}":/action \
-          -e RUNNER_DEBUG="$RUNNER_DEBUG" \
-          -e UNIVERSAL="$UNIVERSAL" \
-          -e MANYLINUX="$image" \
-          -e CONFIG_SETTINGS="$CONFIG_SETTINGS" \
-          -e SETUP="$SETUP" \
-          quay.io/pypa/"$image":latest \
-          bash -ec "$script"
-      env:
-        src_path: ${{ inputs.output_dir }}
-        CONFIG_SETTINGS: ${{ inputs.config_settings }}
-        SETUP: ${{ inputs.setup }}
-        script: |
-          if [ -n "$RUNNER_DEBUG" ];then
-            set -x
-          fi
-          echo 'Installing requirements'
-          python=${{ inputs.python_version }}
-          python_interpreter=cp${python//./}-cp${python//./}
-          manylinux-interpreters ensure "${python_interpreter}"
-          PATH="/opt/python/${python_interpreter}/bin:$PATH"
-          cat > ~/.pypirc << EOF
-            [distutils]
-            index-servers =
-                pypi
-                eeems
-
-            [pypi]
-
-            [eeems]
-            repository = https://wheels.eeems.codes/
-          EOF
-          cd /tmp
-          echo 'Building'
-          python -u /action/build.py "${{ inputs.name }}" "/workspace"
-    - name: Build Wheel
-      if: inputs.build_on == 'debian-armv7l'
-      shell: bash
-      run: |
-        docker run \
-          --rm \
-          --platform=linux/arm/v7 \
-          -v "${src_path}":/workspace \
-          -v "${{ github.action_path }}":/action \
-          -e RUNNER_DEBUG="$RUNNER_DEBUG" \
-          -e UNIVERSAL="$UNIVERSAL" \
-          -e CONFIG_SETTINGS="$CONFIG_SETTINGS" \
-          -e SETUP="$SETUP" \
-          eeems/nuitka-arm-builder:bullseye-${{ inputs.python_version }} \
-          bash -ec "$script"
-      env:
-        src_path: ${{ inputs.output_dir }}
-        CONFIG_SETTINGS: ${{ inputs.config_settings }}
-        SETUP: ${{ inputs.setup }}
-        script: |
-          echo 'Installing requirements'
-          cat > ~/.pypirc << EOF
-            [distutils]
-            index-servers =
-                pypi
-                eeems
-
-            [pypi]
-
-            [eeems]
-            repository = https://wheels.eeems.codes/
-          EOF
-          source /opt/lib/nuitka/bin/activate
-          cd /tmp
-          echo 'Building'
-          python -u /action/build.py "${{ inputs.name }}" "/workspace"
     - uses: actions/setup-python@v6
-      if: inputs.build_on == 'ubuntu-amd64'
       with:
-        python-version: ${{ inputs.python_version }}
+        python-version: ${{ inputs.build_on == 'ubuntu-amd64' && inputs.python_version || '3.11' }}
     - name: Build Wheel
-      if: inputs.build_on == 'ubuntu-amd64'
       shell: bash
       working-directory: ${{ runner.temp }}
       run: |
-        echo 'Installing requirements'
-        cat > ~/.pypirc << EOF
-          [distutils]
-          index-servers =
-              pypi
-              eeems
-
-          [pypi]
-
-          [eeems]
-          repository = https://wheels.eeems.codes/
-        EOF
-        echo 'Building'
-        python -u "${{ github.action_path }}/build.py" "${{ inputs.name }}" "${{ inputs.output_dir  }}"
+        set -e
+        python -u "${{ github.action_path }}/action.py" \
+          --workspace="${{ inputs.output_dir  }}" \
+          --build_on="${{ inputs.build_on  }}" \
+          --python="${{ inputs.python_version  }}" \
+          "${{ inputs.name }}" \
       env:
         SETUP: ${{ inputs.setup }}
         CONFIG_SETTINGS: ${{ inputs.config_settings }}

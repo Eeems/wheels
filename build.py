@@ -195,32 +195,22 @@ def main(name: str, output_dir: str):
         print("Installing requirements to build wheel")
         env.install(builder.get_requires_for_build("wheel"))
         print("Building wheel")
-        builder.build(
+        native_wheel_path = builder.build(
             "wheel",
             output_dir,
             config_settings=json.loads(
                 os.environ.get("CONFIG_SETTINGS", "null") or "null"
             ),
         )
-        wheelpath = os.path.join(output_dir, wheelname)
-        if "MANYLINUX" in os.environ and not os.path.exists(wheelpath):
-            nativewheelname = wheel_name(
-                name=name,
-                version=version,
-                ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
-                universal=universal,
-            )
-            nativewheel = next(iglob(f"{output_dir}/*.whl"), None)
-            if nativewheel is None:
-                raise FileNotFoundException("No wheel found")
+        if "MANYLINUX" in os.environ:
+            print("Repairing wheel(s)")
+            chronic("auditwheel", "repair", native_wheel_path)
+            os.unlink(native_wheel_path)
+            for wheel in iglob("wheelhouse/*.whl"):
+                _ = shutil.move(wheel, output_dir)
+                shutil.rmtree("wheelhouse")
 
-            print("Repairing wheel")
-            chronic("auditwheel", "repair", nativewheel)
-            os.unlink(nativewheel)
-            os.rename(os.path.join("wheelhouse", wheelname), wheelpath)
-            shutil.rmtree("wheelhouse")
-
-        if not os.path.exists(wheelpath):
+        if not os.path.exists(os.path.join(output_dir, wheelname)):
             print("WARNING: Wheel not found, name must not match", file=sys.stderr)
 
         print("Done")
