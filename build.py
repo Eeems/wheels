@@ -121,6 +121,10 @@ def wheel_names(
         if manylinux is None
         else manylinux
     )
+    if not platform:
+        info = uname()
+        platform = f"{info.system.lower()}_{info.machine}"
+
     py_version_nodot = sysconfig.get_config_var("py_version_nodot")  # pyright: ignore[reportAny]
     assert py_version_nodot is not None
     tags: list[str] = []
