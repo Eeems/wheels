@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import sys
+import sysconfig
 from contextlib import AbstractContextManager
 from glob import iglob
 from platform import uname
@@ -96,7 +97,14 @@ class BashRunnerWithSharedEnvironment(AbstractContextManager):  # pyright: ignor
         self.__exit__(None, None, None)  # pyright: ignore[reportUnknownMemberType]
 
 
-def wheel_name(universal: bool = False, manylinux: str | None = None, **kwargs):  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType]  # noqa: ANN201
+def wheel_names(
+    universal: bool = False,
+    manylinux: str | None = None,
+    **kwargs,  # pyright: ignore[reportUnknownParameterType, reportMissingParameterType]
+) -> list[str]:
+    if not universal:
+        kwargs["ext_modules"] = [Extension(kwargs["name"], ["dummy.c"])]  # pyright: ignore[reportUnknownArgumentType]
+
     # create a fake distribution from arguments
     dist = Distribution(attrs=kwargs)  # pyright: ignore[reportUnknownArgumentType]
     # finalize bdist_wheel command
@@ -105,23 +113,36 @@ def wheel_name(universal: bool = False, manylinux: str | None = None, **kwargs):
     bdist_wheel_cmd.universal = universal
     # assemble wheel file name
     distname = bdist_wheel_cmd.wheel_dist_name
-    tag = "-".join(bdist_wheel_cmd.get_tag())
-    if tag.endswith("-"):
-        tag += f"linux_{uname().machine}"
+    if universal:
+        return [f"{distname}-py2.py3-none-any.whl"]
 
-    name = f"{distname}-{tag}.whl"
-    if manylinux is not None:
-        return f"{name.split('-linux_', 1)[0]}-{manylinux}.whl"
+    platform = (
+        sysconfig.get_platform().replace("-", "_").replace(".", "_")
+        if manylinux is None
+        else manylinux
+    )
+    py_version_nodot = sysconfig.get_config_var("py_version_nodot")  # pyright: ignore[reportAny]
+    assert py_version_nodot is not None
+    tags: list[str] = []
+    for python_tag in f"cp{py_version_nodot}", f"py{py_version_nodot}":
+        tags.extend(
+            [
+                f"{distname}-{python_tag}-{python_tag}-{platform}.whl",
+                f"{distname}-{python_tag}-abi3-{platform}.whl",
+                f"{distname}-{python_tag}-none-{platform}.whl",
+                f"{distname}-{python_tag}-none-any.whl",
+            ]
+        )
 
-    return name
+    return tags
 
 
-def debug_log(msg: str):
-    if os.environ.get("RUNNER_DEBUG", "") != "":
+def debug_log(msg: str) -> None:
+    if os.environ.get("RUNNER_DEBUG", ""):
         print(msg)
 
 
-def install(env: DefaultIsolatedEnv, requirements: set[str]):
+def install(env: DefaultIsolatedEnv, requirements: set[str]) -> None:
     debug_log(f"{requirements}")
     try:
         env.install(requirements)
@@ -132,7 +153,7 @@ def install(env: DefaultIsolatedEnv, requirements: set[str]):
         raise
 
 
-def main(name: str, output_dir: str):
+def main(name: str, output_dir: str) -> None:
     print("Checking pypi for latest version")
     response = requests.get(f"https://pypi.org/pypi/{name}/json", timeout=30)
     debug_log(f"  Response code: {response.status_code}")
@@ -147,25 +168,25 @@ def main(name: str, output_dir: str):
 
     print("Getting wheel name")
     universal = os.environ.get("UNIVERSAL", "") == "1"
-    wheelname = wheel_name(
+    wheelnames = wheel_names(
         name=name,
         version=version,  # pyright: ignore[reportAny]
-        ext_modules=[Extension(name, ["dummy.c"])] if not universal else None,
         universal=universal,
         manylinux=os.environ.get("MANYLINUX", None),
     )
-    print(f"Wheel Name: {wheelname}")
+    print(f"Wheel Names: {wheelnames}")
     if not os.environ.get("FORCE", ""):
         print("Checking if wheel exists")
-        if (
-            requests.head(
-                f"https://wheels.eeems.codes/{name.lower()}/{wheelname}",
-                timeout=20,
-            ).status_code
-            == 200
-        ):
-            print("Already exists")
-            return
+        for wheelname in wheelnames:
+            if (
+                requests.head(
+                    f"https://wheels.eeems.codes/{name.lower()}/{wheelname}",
+                    timeout=20,
+                ).status_code
+                == 200
+            ):
+                print("Already exists")
+                return
 
     srctar = None
     for file in data["releases"][version]:  # pyright: ignore[reportAny]
@@ -194,8 +215,8 @@ def main(name: str, output_dir: str):
             "src",
             runner=(
                 default_subprocess_runner
-                # if os.environ.get("RUNNER_DEBUG", "") == "1"
-                # else quiet_subprocess_runner
+                if os.environ.get("RUNNER_DEBUG", "")
+                else quiet_subprocess_runner
             ),
         )
         setup = os.environ.get("SETUP", "")
@@ -228,7 +249,7 @@ def main(name: str, output_dir: str):
                 _ = shutil.move(wheel, output_dir)
                 shutil.rmtree("wheelhouse")
 
-        if not os.path.exists(os.path.join(output_dir, wheelname)):
+        if not any([os.path.exists(os.path.join(output_dir, x)) for x in wheelnames]):
             print("WARNING: Wheel not found, name must not match", file=sys.stderr)
 
         print("Done")
