@@ -228,7 +228,7 @@ def main(name: str, output_dir: str) -> None:
             print("Running setup")
             debug_log(f"script:\n{setup}")
             with BashRunnerWithSharedEnvironment() as runner:  # pyright: ignore[reportUnknownVariableType]
-                runner.run(setup, stdout=subprocess.PIPE)  # pyright: ignore[reportUnknownMemberType]
+                runner.run(setup, stdout=subprocess.PIPE, check=True)  # pyright: ignore[reportUnknownMemberType]
                 for key, value in runner.env.items():  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
                     os.environ[key] = value
 

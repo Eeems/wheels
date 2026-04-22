@@ -65,6 +65,30 @@ def main():
             platform = "linux/arm/v7"
             script.append(". /opt/lib/nuitka/bin/activate")
 
+        case "python":
+            parts = args.build_on.split("-", 2)
+            if len(parts) < 3:
+                raise NotImplementedError(args.build_on)
+
+            arch, libc = parts[1:]
+            match arch:
+                case "armv7l":
+                    platform = "linux/arm/v7"
+
+                case _:
+                    platform = f"linux/{arch}"
+
+            match libc:
+                case "glibc":
+                    image = f"python:{args.python}"
+
+                case "musl":
+                    image = f"python:{args.python}-alpine"
+                    script.append("apk add --no-cache bash")
+
+                case _:
+                    raise NotImplementedError(args.build_on)
+
         case "manylinux":
             parts = args.build_on.split("-", 2)
             if len(parts) < 3:

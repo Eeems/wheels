@@ -377,7 +377,6 @@ jobs:
           - manylinux-x86_64-glibc
           - manylinux-x86_64-musl
           - manylinux-s390x-glibc
-          - manylinux-s390x-musl
           - manylinux-ppc64le-glibc
           - manylinux-ppc64le-musl
           - manylinux-riscv64-glibc
@@ -400,15 +399,54 @@ jobs:
                 libssl-dev
             elif command -v apk >/dev/null;then
               apk add --no-cache \
-                rust \
+                gcc \
+                musl-dev \
+                python3-dev \
+                libffi-dev \
+                openssl-dev \
                 cargo \
-                openssl-dev
+                pkgconfig
             elif command -v dnf >/dev/null;then
               dnf install -y \
                 rustc \
                 cargo \
                 openssl-devel
             fi
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: ignore
+
+  python:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - cryptography
+        python: *python_3_10_up
+        build_on:
+          - python-s390x-glibc
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v6
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
+          python_version: ${{ matrix.python }}
+          setup: |
+            apk add --no-cache \
+              gcc \
+              musl-dev \
+              python3-dev \
+              libffi-dev \
+              openssl-dev \
+              cargo \
+              pkgconfig
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
@@ -453,6 +491,7 @@ jobs:
       - wxpython
       - rust
       - universal
+      - python
     if: ${{ always() }}
     steps:
       - name: Checkout the Git repository
