@@ -128,7 +128,7 @@ def wheel_names(
     py_version_nodot = sysconfig.get_config_var("py_version_nodot")  # pyright: ignore[reportAny]
     assert py_version_nodot is not None
     tags: list[str] = []
-    for python_tag in f"cp{py_version_nodot}", f"py{py_version_nodot}":
+    for python_tag in f"cp{py_version_nodot}", f"py{py_version_nodot}", "py3":
         tags.extend(
             [
                 f"{distname}-{python_tag}-{python_tag}-{platform}.whl",
