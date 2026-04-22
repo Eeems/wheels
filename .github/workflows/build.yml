@@ -22,7 +22,7 @@ jobs:
           - protobuf
           - zstandard
           - pynacl
-        python:
+        python: &python_3_10_up
           - "3.13"
           - "3.12"
           - "3.11"
@@ -53,10 +53,7 @@ jobs:
   #     matrix:
   #       package:
   #         - pyqt5
-  #       python:
-  #         - '3.13'
-  #         - '3.12'
-  #         - '3.11'
+  #       python: *python_3_10_up
   #       build_on:
   #         - debian-armv7l
   #   steps:
@@ -95,7 +92,8 @@ jobs:
         package:
           - remarkable-update-image
           - remarkable-update-fuse
-        python:
+        python: &python_3_11_up
+          - "3.14"
           - "3.13"
           - "3.12"
           - "3.11"
@@ -125,10 +123,7 @@ jobs:
       matrix:
         package:
           - evdev
-        python:
-          - "3.13"
-          - "3.12"
-          - "3.11"
+        python: *python_3_11_up
         build_on:
           - debian-armv7l
     steps:
@@ -240,10 +235,7 @@ jobs:
       matrix:
         package:
           - numpy
-        python:
-          - "3.13"
-          - "3.12"
-          - "3.11"
+        python: *python_3_11_up
         build_on:
           - debian-armv7l
     steps:
@@ -287,6 +279,7 @@ jobs:
         package:
           - fuse-python
         python:
+          - "3.14"
           - "3.13"
         build_on:
           - ubuntu-amd64
@@ -323,10 +316,7 @@ jobs:
       matrix:
         package:
           - wxpython
-        python:
-          - "3.13"
-          - "3.12"
-          - "3.11"
+        python: *python_3_11_up
         build_on:
           - ubuntu-amd64
     steps:
@@ -378,11 +368,7 @@ jobs:
         package:
           - cryptography
           - bcrypt
-        python:
-          - "3.13"
-          - "3.12"
-          - "3.11"
-          - "3.10"
+        python: *python_3_10_up
         build_on:
           - manylinux-armv7l-glibc
           - manylinux-armv7l-musl
