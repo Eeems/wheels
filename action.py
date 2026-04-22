@@ -20,6 +20,7 @@ def chronic(*args: str) -> None:
 def main():
     parser = argparse.ArgumentParser()
     _ = parser.add_argument("name", help="Package name")
+    _ = parser.add_argument("--force", help="Force build", action="store_true")
     _ = parser.add_argument(
         "--workspace",
         help="Path to workspace",
@@ -108,6 +109,7 @@ def main():
 
     assert isinstance(args.name, str)  # pyright: ignore[reportAny]
     assert isinstance(args.workspace, str)  # pyright: ignore[reportAny]
+    assert isinstance(args.force, bool)  # pyright: ignore[reportAny]
     if image is None:
         if [sys.version_info.major, sys.version_info.minor] != [
             int(x) for x in args.python.split(".")
@@ -119,6 +121,11 @@ def main():
         venv_python = os.path.join(venv, "bin", "python")
         chronic(venv_python, "-m", "ensurepip")
         chronic(venv_python, "-m", "pip", "install", "--upgrade", "pip")
+        env = os.environ.copy()
+        if args.force:
+            env["FORCE"] = "1"
+
+        env["PYTHONUNBUFFERED"] = "1"
         _ = subprocess.run(
             [
                 venv_python,
@@ -127,6 +134,7 @@ def main():
                 args.name,
                 args.workspace,
             ],
+            env=env,
             check=True,
         )
         return
@@ -144,6 +152,8 @@ def main():
             f"--env=CONFIG_SETTINGS={os.environ.get('CONFIG_SETTINGS', '')}",
             f"--env=SETUP={os.environ.get('SETUP', '')}",
             f"--env=MANYLINUX={manylinux}",
+            *(["--env=FORCE=1"] if args.force else []),
+            "--env=PYTHONUNBUFFERED=1",
             image,
             "sh",
             "-ec",
