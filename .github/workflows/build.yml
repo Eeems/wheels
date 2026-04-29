@@ -439,14 +439,11 @@ jobs:
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
           setup: |
-            apk add --no-cache \
-              gcc \
-              musl-dev \
-              python3-dev \
-              libffi-dev \
-              openssl-dev \
+            apt-get update
+            DEBIAN_FRONTEND=noninteractive apt-get install -y \
+              rustc \
               cargo \
-              pkgconfig
+              libssl-dev
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
