@@ -391,7 +391,12 @@ jobs:
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
           setup: |
-            if command -v apt-get >/dev/null; then
+            if [[ "${{ matrix.build_on }}" == "manylinux-armv7l-glibc" ]];then
+              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+              source "$HOME"/.cargo/env
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y libssl-dev
+            elif command -v apt-get >/dev/null; then
               apt-get update
               DEBIAN_FRONTEND=noninteractive apt-get install -y \
                 rustc \
