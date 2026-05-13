@@ -23,6 +23,7 @@ jobs:
           - zstandard
           - pynacl
         python: &python_3_10_up
+          - "3.14"
           - "3.13"
           - "3.12"
           - "3.11"
@@ -278,7 +279,7 @@ jobs:
       matrix:
         package:
           - fuse-python
-        python:
+        python: &python_3_13_up
           - "3.14"
           - "3.13"
         build_on:
