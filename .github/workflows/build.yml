@@ -26,7 +26,7 @@ jobs:
           - "3.12"
           - "3.11"
           - "3.10"
-        build_on: &build_on_all
+        build_on: &build_on_all_manylinux
           - manylinux-armv7l-glibc
           - manylinux-armv7l-musl
           - manylinux-aarch64-glibc
@@ -62,9 +62,55 @@ jobs:
         package:
           - zstandard
           - pynacl
+        python: *python_3_10_up
+        build_on: *build_on_all_manylinux
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v6
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
+          python_version: ${{ matrix.python }}
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: ignore
+
+  indexed-gzip:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
           - indexed-gzip
         python: *python_3_10_up
-        build_on: *build_on_all
+        build_on:
+          - manylinux-armv7l-glibc
+          - manylinux-armv7l-musl
+          - manylinux-aarch64-glibc
+          - manylinux-aarch64-musl
+          - manylinux-x86_64-glibc
+          - manylinux-x86_64-musl
+          - manylinux-s390x-glibc
+          - manylinux-ppc64le-glibc
+          - manylinux-ppc64le-musl
+          - manylinux-riscv64-glibc
+          - manylinux-riscv64-musl
+          - python-armv7l-glibc
+          - python-armv7l-musl
+          - python-aarch64-glibc
+          - python-aarch64-musl
+          - python-x86_64-glibc
+          - python-x86_64-musl
+          - python-s390x-glibc
+          - python-ppc64le-glibc
+          - python-ppc64le-musl
+          - python-riscv64-glibc
+          - python-riscv64-musl
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v6
@@ -420,6 +466,7 @@ jobs:
       - wxpython
       - bcrypt
       - cryptography
+      - indexed-gzip
     if: ${{ always() }}
     steps:
       - name: Checkout the Git repository
