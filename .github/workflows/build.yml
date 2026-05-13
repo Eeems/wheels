@@ -381,6 +381,7 @@ jobs:
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
+          if-no-files-found: ignore
  
   mirror:
     name: Deploy
