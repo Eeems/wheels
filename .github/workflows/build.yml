@@ -22,6 +22,7 @@ jobs:
           - protobuf
           - zstandard
           - pynacl
+          - indexed-gzip
         python: &python_3_10_up
           - "3.14"
           - "3.13"
@@ -40,76 +41,6 @@ jobs:
           - manylinux-ppc64le-musl
           - manylinux-riscv64-glibc
           - manylinux-riscv64-musl
-    steps:
-      - name: Checkout the Git repository
-        uses: actions/checkout@v6
-      - name: Build ${{ matrix.package }}
-        uses: ./
-        with:
-          name: ${{ matrix.package }}
-          build_on: ${{ matrix.build_on }}
-          python_version: ${{ matrix.python }}
-      - uses: actions/upload-artifact@v6
-        with:
-          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-          path: dist
-          if-no-files-found: ignore
-
-  # pyqt5:
-  #   name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-  #   runs-on: ubuntu-latest
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       package:
-  #         - pyqt5
-  #       python: *python_3_10_up
-  #       build_on:
-  #         - debian-armv7l
-  #   steps:
-  #     - name: Checkout the Git repository
-  #       uses: actions/checkout@v6
-  #     - name: Build ${{ matrix.package }}
-  #       uses: ./
-  #       with:
-  #         name: ${{ matrix.package }}
-  #         build_on: ${{ matrix.build_on }}
-  #         python_version: ${{ matrix.python }}
-  #         config_settings: |
-  #           { "--confirm-license": "" }
-  #         setup: |
-  #           SUDO=''
-  #           if [ "$EUID" -ne 0 ]; then
-  #             SUDO=sudo
-  #           fi
-  #           export DEBIAN_FRONTEND="noninteractive"
-  #           $SUDO apt-get -y update
-  #           $SUDO apt-get install -y \
-  #             qtbase5-dev \
-  #             qt5-qmake
-  #     - uses: actions/upload-artifact@v6
-  #       with:
-  #         name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-  #         path: dist
-  #         if-no-files-found: ignore
-
-  standard-3_11-up:
-    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - remarkable-update-image
-          - remarkable-update-fuse
-        python: &python_3_11_up
-          - "3.14"
-          - "3.13"
-          - "3.12"
-          - "3.11"
-        build_on:
-          - ubuntu-amd64
-          - debian-armv7l
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v6
@@ -193,44 +124,6 @@ jobs:
               libharfbuzz-dev \
               libfribidi-dev \
               libxcb1-dev
-      - uses: actions/upload-artifact@v6
-        with:
-          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-          path: dist
-          if-no-files-found: ignore
-  ninja:
-    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - ninja
-        python:
-          - "3.11" # only one version needed now that it's py3-none
-        build_on:
-          - debian-armv7l
-    steps:
-      - name: Checkout the Git repository
-        uses: actions/checkout@v6
-      - name: Build ${{ matrix.package }}
-        uses: ./
-        with:
-          name: ${{ matrix.package }}
-          build_on: ${{ matrix.build_on }}
-          python_version: ${{ matrix.python }}
-          setup: |
-            SUDO=''
-            if [ "$EUID" -ne 0 ]; then
-              SUDO=sudo
-            fi
-            export DEBIAN_FRONTEND="noninteractive"
-            $SUDO apt-get -y update
-            $SUDO apt-get install -y \
-              build-essential \
-              python3-pip \
-              python3-dev \
-              cmake
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
@@ -369,28 +262,23 @@ jobs:
           path: dist
           if-no-files-found: ignore
 
-  rust:
+  bcrypt:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         package:
-          - cryptography
           - bcrypt
         python: *python_3_10_up
         build_on:
           - manylinux-armv7l-glibc
           - manylinux-armv7l-musl
-          - manylinux-aarch64-glibc
-          - manylinux-aarch64-musl
-          - manylinux-x86_64-glibc
-          - manylinux-x86_64-musl
           - manylinux-s390x-glibc
-          - manylinux-ppc64le-glibc
-          - manylinux-ppc64le-musl
           - manylinux-riscv64-glibc
           - manylinux-riscv64-musl
+          - manylinux-ppc64le-glibc
+          - manylinux-ppc64le-musl
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v6
@@ -433,7 +321,7 @@ jobs:
           path: dist
           if-no-files-found: ignore
 
-  python:
+  cryptography:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
     strategy:
@@ -443,6 +331,11 @@ jobs:
           - cryptography
         python: *python_3_10_up
         build_on:
+          - manylinux-armv7l-glibc
+          - manylinux-armv7l-musl
+          - manylinux-s390x-glibc
+          - manylinux-riscv64-glibc
+          - manylinux-riscv64-musl
           - python-s390x-glibc
     steps:
       - name: Checkout the Git repository
@@ -454,56 +347,49 @@ jobs:
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
           setup: |
-            apt-get update
-            DEBIAN_FRONTEND=noninteractive apt-get install -y \
-              rustc \
-              cargo \
-              libssl-dev
+            if [[ "${{ matrix.build_on }}" == "manylinux-armv7l-glibc" ]];then
+              curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+              source "$HOME"/.cargo/env
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y libssl-dev
+            elif command -v apt-get >/dev/null; then
+              apt-get update
+              DEBIAN_FRONTEND=noninteractive apt-get install -y \
+                rustc \
+                cargo \
+                libssl-dev
+            elif command -v apk >/dev/null;then
+              apk add --no-cache \
+                gcc \
+                musl-dev \
+                python3-dev \
+                libffi-dev \
+                openssl-dev \
+                cargo \
+                pkgconfig
+            elif command -v dnf >/dev/null;then
+              dnf install -y \
+                rustc \
+                cargo \
+                openssl-devel
+            fi
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
-          if-no-files-found: ignore
-
-  universal:
-    name: ${{ matrix.package }}-py2.py3-none-any
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - exodus-bundler
-    steps:
-      - name: Checkout the Git repository
-        uses: actions/checkout@v6
-      - name: Build ${{ matrix.package }}
-        uses: ./
-        with:
-          name: ${{ matrix.package }}
-        env:
-          UNIVERSAL: 1
-      - uses: actions/upload-artifact@v6
-        with:
-          name: ${{ matrix.package }}-py2.py3-none-any
-          path: dist
-          if-no-files-found: ignore
-
+ 
   mirror:
     name: Deploy
     environment: wheels.eeems.codes
     runs-on: self-hosted
     needs:
       - standard
-      - standard-3_11-up
       - arm-3_11-up
-      # - pyqt5
       - pillow
       - numpy
-      - ninja
       - wxpython
-      - rust
-      - universal
-      - python
+      - bcrypt
+      - cryptography
     if: ${{ always() }}
     steps:
       - name: Checkout the Git repository
