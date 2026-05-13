@@ -20,16 +20,13 @@ jobs:
           - crcmod
           - nuitka
           - protobuf
-          - zstandard
-          - pynacl
-          - indexed-gzip
         python: &python_3_10_up
           - "3.14"
           - "3.13"
           - "3.12"
           - "3.11"
           - "3.10"
-        build_on:
+        build_on: &build_on_all
           - manylinux-armv7l-glibc
           - manylinux-armv7l-musl
           - manylinux-aarch64-glibc
@@ -41,6 +38,33 @@ jobs:
           - manylinux-ppc64le-musl
           - manylinux-riscv64-glibc
           - manylinux-riscv64-musl
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v6
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
+          python_version: ${{ matrix.python }}
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: ignore
+
+  standard_2:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - zstandard
+          - pynacl
+          - indexed-gzip
+        python: *python_3_10_up
+        build_on: *build_on_all
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v6
@@ -382,13 +406,14 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
- 
+
   mirror:
     name: Deploy
     environment: wheels.eeems.codes
     runs-on: self-hosted
     needs:
       - standard
+      - standard_2
       - arm-3_11-up
       - pillow
       - numpy
