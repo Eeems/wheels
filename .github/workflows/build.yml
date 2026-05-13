@@ -64,7 +64,11 @@ jobs:
       matrix:
         package:
           - evdev
-        python: *python_3_11_up
+        python: &python_3_11_up
+          - "3.14"
+          - "3.13"
+          - "3.12"
+          - "3.11"
         build_on:
           - debian-armv7l
     steps:
