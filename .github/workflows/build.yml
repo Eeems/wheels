@@ -12,9 +12,6 @@ jobs:
   standard:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -54,21 +51,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   protobuf:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -105,21 +91,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   cffi:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -147,21 +122,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   # nuitka:
   #   name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
   #   runs-on: ubuntu-latest
-  #   environment:
-  #     name: wheels.eeems.codes
-  #     deployment: false
   #   strategy:
   #     fail-fast: false
   #     matrix:
@@ -188,7 +152,7 @@ jobs:
   #     - name: Checkout the Git repository
   #       uses: actions/checkout@v6
   #     - name: Build ${{ matrix.package }}
-  #       uses: ./build/
+  #       uses: ./
   #       with:
   #         name: ${{ matrix.package }}
   #         build_on: ${{ matrix.build_on }}
@@ -198,21 +162,10 @@ jobs:
   #         name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
   #         path: dist
   #         if-no-files-found: ignore
-  #     - name: Mirror wheels
-  #       uses: ./mirror/
-  #       with:
-  #         name: ${{ matrix.package }}
-  #         ssh_host: ${{ vars.SSH_SERVER }}
-  #         ssh_key: ${{secrets.SSH_KEY}}
-  #         ssh_dir: ${{ vars.SSH_PATH }}
-  #         ssh_user: ${{ vars.SSH_USER }}
 
   indexed-gzip:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -263,21 +216,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   arm-3_11-up:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -300,21 +242,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   pillow:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -359,21 +290,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   numpy:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -413,21 +333,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   fuse-python:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -462,21 +371,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   wxpython:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -524,21 +422,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   bcrypt:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -594,21 +481,10 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
-      - name: Mirror wheels
-        uses: ./mirror/
-        with:
-          name: ${{ matrix.package }}
-          ssh_host: ${{ vars.SSH_SERVER }}
-          ssh_key: ${{secrets.SSH_KEY}}
-          ssh_dir: ${{ vars.SSH_PATH }}
-          ssh_user: ${{ vars.SSH_USER }}
 
   cryptography:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
-    environment:
-      name: wheels.eeems.codes
-      deployment: false
     strategy:
       fail-fast: false
       matrix:
@@ -663,10 +539,33 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
+
+  mirror:
+    name: Deploy
+    environment: wheels.eeems.codes
+    runs-on: self-hosted
+    needs:
+      - arm-3_11-up
+      - bcrypt
+      - cffi
+      - cryptography
+      - indexed-gzip
+      # - nuitka
+      - numpy
+      - pillow
+      - protobuf
+      - standard
+      - wxpython
+    if: ${{ always() }}
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v6
+      - uses: actions/download-artifact@v8
+        with:
+          path: ./dist
       - name: Mirror wheels
         uses: ./mirror/
         with:
-          name: ${{ matrix.package }}
           ssh_host: ${{ vars.SSH_SERVER }}
           ssh_key: ${{secrets.SSH_KEY}}
           ssh_dir: ${{ vars.SSH_PATH }}

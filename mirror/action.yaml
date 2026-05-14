@@ -5,9 +5,6 @@ branding:
   icon: tablet
   color: white
 inputs:
-  name:
-    description: Name of package being irrored
-    required: true
   input_dir:
     description: Input directory of wheels
     required: false
@@ -31,13 +28,16 @@ inputs:
 runs:
   using: composite
   steps:
+    - uses: actions/setup-python@v6
+      with:
+        python-version: "3.11"
     - name: Create directories
       shell: bash
       run: |
         python -u "${{ github.action_path }}"create_dirs.py \
           "${{ inputs.input_dir }}" \
           "${{ inputs.output_dir }}"
-    - name: Sync with wheels.eeems.codes
+    - name: Sync with server
       shell: bash
       run: |
         if ! [ -z "$(ls -A "${{ inputs.input_dir }}")" ]; then
