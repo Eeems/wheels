@@ -16,17 +16,16 @@ jobs:
       fail-fast: false
       matrix:
         package:
-          - cffi
           - crcmod
-          - nuitka
-          - protobuf
+          - zstandard
+          - pynacl
         python: &python_3_10_up
           - "3.14"
           - "3.13"
           - "3.12"
           - "3.11"
           - "3.10"
-        build_on: &build_on_all_manylinux
+        build_on:
           - manylinux-armv7l-glibc
           - manylinux-armv7l-musl
           - manylinux-aarch64-glibc
@@ -53,17 +52,31 @@ jobs:
           path: dist
           if-no-files-found: ignore
 
-  standard_2:
+  protobuf:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         package:
-          - zstandard
-          - pynacl
-        python: *python_3_10_up
-        build_on: *build_on_all_manylinux
+          - protobuf
+        python: &python_3_11_up
+          - "3.14"
+          - "3.13"
+          - "3.12"
+          - "3.11"
+        build_on:
+          - manylinux-armv7l-glibc
+          - manylinux-armv7l-musl
+          - manylinux-aarch64-glibc
+          - manylinux-aarch64-musl
+          - manylinux-x86_64-glibc
+          - manylinux-x86_64-musl
+          - manylinux-s390x-glibc
+          - manylinux-ppc64le-glibc
+          - manylinux-ppc64le-musl
+          - manylinux-riscv64-glibc
+          - manylinux-riscv64-musl
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v6
@@ -78,6 +91,77 @@ jobs:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
           path: dist
           if-no-files-found: ignore
+
+  cffi:
+    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package:
+          - cffi
+        python: *python_3_10_up
+        build_on:
+          - manylinux-armv7l-musl
+          - manylinux-s390x-glibc
+          - manylinux-ppc64le-glibc
+          - manylinux-ppc64le-musl
+          - manylinux-riscv64-glibc
+          - manylinux-riscv64-musl
+    steps:
+      - name: Checkout the Git repository
+        uses: actions/checkout@v6
+      - name: Build ${{ matrix.package }}
+        uses: ./
+        with:
+          name: ${{ matrix.package }}
+          build_on: ${{ matrix.build_on }}
+          python_version: ${{ matrix.python }}
+      - uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+          path: dist
+          if-no-files-found: ignore
+
+  # nuitka:
+  #   name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+  #   runs-on: ubuntu-latest
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       package:
+  #         - nuitka
+  #       python: &python_3_10_up
+  #         - "3.14"
+  #         - "3.13"
+  #         - "3.12"
+  #         - "3.11"
+  #         - "3.10"
+  #       build_on:
+  #         - manylinux-armv7l-musl
+  #         - manylinux-aarch64-glibc
+  #         - manylinux-aarch64-musl
+  #         - manylinux-x86_64-glibc
+  #         - manylinux-x86_64-musl
+  #         - manylinux-s390x-glibc
+  #         - manylinux-ppc64le-glibc
+  #         - manylinux-ppc64le-musl
+  #         - manylinux-riscv64-glibc
+  #         - manylinux-riscv64-musl
+  #   steps:
+  #     - name: Checkout the Git repository
+  #       uses: actions/checkout@v6
+  #     - name: Build ${{ matrix.package }}
+  #       uses: ./
+  #       with:
+  #         name: ${{ matrix.package }}
+  #         build_on: ${{ matrix.build_on }}
+  #         python_version: ${{ matrix.python }}
+  #     - uses: actions/upload-artifact@v6
+  #       with:
+  #         name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
+  #         path: dist
+  #         if-no-files-found: ignore
 
   indexed-gzip:
     name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
@@ -120,6 +204,13 @@ jobs:
           name: ${{ matrix.package }}
           build_on: ${{ matrix.build_on }}
           python_version: ${{ matrix.python }}
+          setup: |
+            if command -v apk >/dev/null;then
+              apk add --no-cache \
+                gcc \
+                musl-dev \
+                zlib-dev
+            fi
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
@@ -134,11 +225,7 @@ jobs:
       matrix:
         package:
           - evdev
-        python: &python_3_11_up
-          - "3.14"
-          - "3.13"
-          - "3.12"
-          - "3.11"
+        python: *python_3_11_up
         build_on:
           - debian-armv7l
     steps:
@@ -255,7 +342,7 @@ jobs:
       matrix:
         package:
           - fuse-python
-        python: &python_3_13_up
+        python:
           - "3.14"
           - "3.13"
         build_on:
@@ -458,15 +545,17 @@ jobs:
     environment: wheels.eeems.codes
     runs-on: self-hosted
     needs:
-      - standard
-      - standard_2
       - arm-3_11-up
-      - pillow
-      - numpy
-      - wxpython
       - bcrypt
+      - cffi
       - cryptography
       - indexed-gzip
+      # - nuitka
+      - numpy
+      - pillow
+      - protobuf
+      - standard
+      - wxpython
     if: ${{ always() }}
     steps:
       - name: Checkout the Git repository
