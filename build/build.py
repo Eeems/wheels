@@ -134,6 +134,31 @@ def manylinux_compound_platforms(manylinux: str) -> list[str]:
     return platforms
 
 
+def manylinux_older_platforms(manylinux: str) -> list[str]:
+    parts = manylinux.split("_", 3)
+    prefix = parts[0]
+    if prefix != "manylinux":
+        return []
+
+    version = int(parts[1]), int(parts[2])
+    arch = parts[3]
+    platforms: list[str] = []
+    for minor in range(5, 39):
+        if (2, minor) < version:
+            platforms.append(f"manylinux_2_{minor}_{arch}")
+
+    return platforms
+
+
+def manylinux_other_platforms(manylinux: str) -> list[str]:
+    older = manylinux_older_platforms(manylinux)
+    platforms: list[str] = [*manylinux_compound_platforms(manylinux), *older]
+    for platform in older:
+        platforms.extend(manylinux_compound_platforms(platform))
+
+    return list(set(platforms))
+
+
 def wheel_names(
     universal: bool = False,
     manylinux: str | None = None,
@@ -161,7 +186,7 @@ def wheel_names(
 
     platforms: list[str] = [platform]
     if manylinux is not None:
-        platforms.extend(manylinux_compound_platforms(manylinux))
+        platforms.extend(manylinux_other_platforms(manylinux))
 
     py_version_nodot = sysconfig.get_config_var("py_version_nodot")  # pyright: ignore[reportAny]
     assert py_version_nodot is not None
