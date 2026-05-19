@@ -131,32 +131,37 @@ def manylinux_compound_platforms(manylinux: str) -> list[str]:
                 )
             )
 
-    return platforms
-
-
-def manylinux_older_platforms(manylinux: str) -> list[str]:
-    parts = manylinux.split("_", 3)
-    prefix = parts[0]
-    if prefix != "manylinux":
-        return []
-
-    version = int(parts[1]), int(parts[2])
-    arch = parts[3]
-    platforms: list[str] = []
-    for minor in range(5, 39):
-        if (2, minor) < version:
-            platforms.append(f"manylinux_2_{minor}_{arch}")
+    if arch in ("armv7l", "riscv64"):
+        platforms.append(
+            f"manylinux_{version[0]}_{version[1] - 1}_{arch}.manylinux_{version[0]}_{version[1]}_{arch}"
+        )
 
     return platforms
 
 
-def manylinux_other_platforms(manylinux: str) -> list[str]:
-    older = manylinux_older_platforms(manylinux)
-    platforms: list[str] = [*manylinux_compound_platforms(manylinux), *older]
-    for platform in older:
-        platforms.extend(manylinux_compound_platforms(platform))
+# def manylinux_older_platforms(manylinux: str) -> list[str]:
+#     parts = manylinux.split("_", 3)
+#     prefix = parts[0]
+#     if prefix != "manylinux":
+#         return []
 
-    return list(set(platforms))
+#     version = int(parts[1]), int(parts[2])
+#     arch = parts[3]
+#     platforms: list[str] = []
+#     for minor in range(5, 39):
+#         if (2, minor) < version:
+#             platforms.append(f"manylinux_2_{minor}_{arch}")
+
+#     return platforms
+
+
+# def manylinux_other_platforms(manylinux: str) -> list[str]:
+#     older = manylinux_older_platforms(manylinux)
+#     platforms: list[str] = [*manylinux_compound_platforms(manylinux), *older]
+#     for platform in older:
+#         platforms.extend(manylinux_compound_platforms(platform))
+
+#     return list(set(platforms))
 
 
 def wheel_names(
@@ -186,7 +191,7 @@ def wheel_names(
 
     platforms: list[str] = [platform]
     if manylinux is not None:
-        platforms.extend(manylinux_other_platforms(manylinux))
+        platforms.extend(manylinux_compound_platforms(manylinux))
 
     py_version_nodot = sysconfig.get_config_var("py_version_nodot")  # pyright: ignore[reportAny]
     assert py_version_nodot is not None
@@ -222,7 +227,7 @@ def install(env: DefaultIsolatedEnv, requirements: set[str]) -> None:
 
 
 def main(name: str, output_dir: str) -> None:
-    print("Checking pypi for latest version")
+    print("Checking pypi for latest version...")
     response = requests.get(f"https://pypi.org/pypi/{name}/json", timeout=30)
     debug_log(f"  Response code: {response.status_code}")
     if response.status_code != 200:
@@ -234,7 +239,7 @@ def main(name: str, output_dir: str) -> None:
     version = data["info"]["version"]  # pyright: ignore[reportAny]
     name = data["info"]["name"]  # Use the official name  # pyright: ignore[reportAny]
 
-    print("Getting wheel name")
+    print("Getting wheel names...")
     universal = os.environ.get("UNIVERSAL", "") == "1"
     wheelnames = wheel_names(
         name=name,
@@ -244,7 +249,7 @@ def main(name: str, output_dir: str) -> None:
     )
     print(f"Wheel Names: {wheelnames}")
     if not os.environ.get("FORCE", ""):
-        print("Checking if wheel exists")
+        print("Checking if wheel exists...")
         for wheelname in wheelnames:
             if (
                 requests.head(
@@ -262,7 +267,7 @@ def main(name: str, output_dir: str) -> None:
             srctar = file  # pyright: ignore[reportAny]
 
     assert srctar is not None
-    print("Downloading source")
+    print("Downloading source...")
     debug_log(f"  url: {srctar['url']}")
     response = requests.get(srctar["url"], timeout=30, stream=True)  # pyright: ignore[reportAny]
     debug_log(f"Response code: {response.status_code}")
@@ -275,7 +280,7 @@ def main(name: str, output_dir: str) -> None:
         shutil.rmtree("src")
 
     os.mkdir("src")
-    print("Extracting source")
+    print("Extracting source...")
     chronic("tar", "-xf", "src.tar.gz", "--strip-components=1", "--directory=src")
     with DefaultIsolatedEnv(installer="pip") as env:
         builder = ProjectBuilder.from_isolated_env(
@@ -296,12 +301,12 @@ def main(name: str, output_dir: str) -> None:
                 for key, value in runner.env.items():  # pyright: ignore[reportUnknownMemberType, reportUnknownVariableType]
                     os.environ[key] = value
 
-        print("Installing build system requirements")
+        print("Installing build system requirements...")
         install(env, builder.build_system_requires)
-        print("Installing requirements to build wheel")
+        print("Installing requirements to build wheel...")
         requirements = builder.get_requires_for_build("wheel")
         install(env, requirements)
-        print("Building wheel")
+        print("Building wheel...")
         native_wheel_path = builder.build(
             "wheel",
             output_dir,
@@ -310,7 +315,7 @@ def main(name: str, output_dir: str) -> None:
             ),
         )
         if os.environ.get("MANYLINUX", ""):
-            print("Repairing wheel(s)")
+            print("Repairing wheel(s)...")
             chronic("auditwheel", "repair", native_wheel_path)
             os.unlink(native_wheel_path)
             for wheel in iglob("wheelhouse/*.whl"):
@@ -320,7 +325,7 @@ def main(name: str, output_dir: str) -> None:
         if not any([os.path.exists(os.path.join(output_dir, x)) for x in wheelnames]):
             print("WARNING: Wheel not found, name must not match", file=sys.stderr)
 
-        print("Done")
+        print("Done!")
 
 
 parser = argparse.ArgumentParser()
