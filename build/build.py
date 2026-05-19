@@ -97,6 +97,43 @@ class BashRunnerWithSharedEnvironment(AbstractContextManager):  # pyright: ignor
         self.__exit__(None, None, None)  # pyright: ignore[reportUnknownMemberType]
 
 
+def manylinux_compound_platforms(manylinux: str) -> list[str]:
+    parts = manylinux.split("_", 3)
+    prefix = parts[0]
+    if prefix != "manylinux":
+        return []
+
+    version = int(parts[1]), int(parts[2])
+    arch = parts[3]
+    platforms: list[str] = []
+    for legacy_alias, pep600_tag, policy_version, archs in [
+        ("manylinux1", "manylinux_2_5", (2, 5), frozenset({"x86_64", "i686"})),
+        ("manylinux2010", "manylinux_2_12", (2, 12), frozenset({"x86_64", "i686"})),
+        (
+            "manylinux2014",
+            "manylinux_2_17",
+            (2, 17),
+            frozenset(
+                {"x86_64", "i686", "aarch64", "armv7l", "ppc64", "ppc64le", "s390x"}
+            ),
+        ),
+    ]:
+        if policy_version <= version and arch in archs:
+            platforms.append(
+                ".".join(
+                    sorted(
+                        {
+                            f"{pep600_tag}_{arch}",
+                            f"{legacy_alias}_{arch}",
+                            manylinux,
+                        }
+                    )
+                )
+            )
+
+    return platforms
+
+
 def wheel_names(
     universal: bool = False,
     manylinux: str | None = None,
@@ -105,13 +142,10 @@ def wheel_names(
     if not universal:
         kwargs["ext_modules"] = [Extension(kwargs["name"], ["dummy.c"])]  # pyright: ignore[reportUnknownArgumentType]
 
-    # create a fake distribution from arguments
     dist = Distribution(attrs=kwargs)  # pyright: ignore[reportUnknownArgumentType]
-    # finalize bdist_wheel command
     bdist_wheel_cmd = dist.get_command_obj("bdist_wheel")
     bdist_wheel_cmd.ensure_finalized()
     bdist_wheel_cmd.universal = universal
-    # assemble wheel file name
     distname = bdist_wheel_cmd.wheel_dist_name
     if universal:
         return [f"{distname}-py2.py3-none-any.whl"]
@@ -125,18 +159,23 @@ def wheel_names(
         info = uname()
         platform = f"{info.system.lower()}_{info.machine}"
 
+    platforms: list[str] = [platform]
+    if manylinux is not None:
+        platforms.extend(manylinux_compound_platforms(manylinux))
+
     py_version_nodot = sysconfig.get_config_var("py_version_nodot")  # pyright: ignore[reportAny]
     assert py_version_nodot is not None
     tags: list[str] = []
     for python_tag in f"cp{py_version_nodot}", f"py{py_version_nodot}", "py3":
-        tags.extend(
-            [
-                f"{distname}-{python_tag}-{python_tag}-{platform}.whl",
-                f"{distname}-{python_tag}-abi3-{platform}.whl",
-                f"{distname}-{python_tag}-none-{platform}.whl",
-                f"{distname}-{python_tag}-none-any.whl",
-            ]
-        )
+        tags.append(f"{distname}-{python_tag}-none-any.whl")
+        for platform in platforms:
+            tags.extend(
+                [
+                    f"{distname}-{python_tag}-{python_tag}-{platform}.whl",
+                    f"{distname}-{python_tag}-abi3-{platform}.whl",
+                    f"{distname}-{python_tag}-none-{platform}.whl",
+                ]
+            )
 
     return tags
 
