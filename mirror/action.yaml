@@ -25,6 +25,10 @@ inputs:
   ssh_user:
     description: User to authenticate as
     required: true
+  ssh_args:
+    description: Extra ssh arguments
+    required: false
+    default: -p 22
 runs:
   using: composite
   steps:
@@ -46,7 +50,7 @@ runs:
           echo "$SSH_KEY" > "$KEY_LOCATION"
           rsync \
             -Pcuav \
-            -e "ssh -p 22 -oStrictHostKeyChecking=no -i \"$KEY_LOCATION\"" \
+            -e "ssh ${{ inputs.ssh_args }} -oStrictHostKeyChecking=no -i \"$KEY_LOCATION\"" \
             "${{ inputs.output_dir }}"/* \
             "$SSH_USER@$SSH_HOST:$SSH_DIR/"
           rm "$KEY_LOCATION"

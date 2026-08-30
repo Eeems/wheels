@@ -570,3 +570,4 @@ jobs:
           ssh_key: ${{secrets.SSH_KEY}}
           ssh_dir: ${{ vars.SSH_PATH }}
           ssh_user: ${{ vars.SSH_USER }}
+          ssh_args: ${{ vars.SSH_ARGS }}
