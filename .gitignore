@@ -161,3 +161,4 @@ src.tar.gz
 src/
 *.whl
 metadata/
+.pi/
