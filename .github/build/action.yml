@@ -1,0 +1,32 @@
+name: Build wheel
+description: Builds a Python wheel using cibuildwheel for the target manylinux/Debian image.
+author: Eeems
+
+inputs:
+  name:
+    description: Package name to build
+    required: true
+  build_on:
+    description: Build target (e.g. manylinux-x86_64-glibc, debian-armv7l)
+    required: true
+  python_version:
+    description: Python version string (e.g. "3.12")
+    required: true
+  setup:
+    description: Extra shell commands to run before the build
+    required: false
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - name: Fail — ./build/ action not available in this fork
+      shell: bash
+      run: |
+        echo "error: this wheels fork does not have a ./build/ composite action."
+        echo "  The upstream Eeems/wheels repo has never included these action directories."
+        echo "  Wheel builds (cibuildwheel + docker/cross-compilation) are an upstream-only concern."
+        echo "  Package: ${{ inputs.name }}"
+        echo "  Build-on: ${{ inputs.build_on }}"
+        echo "  Python: ${{ inputs.python_version }}"
+        exit 1
