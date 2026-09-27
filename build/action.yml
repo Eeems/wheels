@@ -16,36 +16,10 @@ inputs:
     description: Python version to use
     required: false
     default: "3.13"
-    type: choice
-    options:
-      - "3.14"
-      - "3.13"
-      - "3.12"
-      - "3.11"
-      - "3.10"
-      - "3.9"
   build_on:
     description: Build target to use
     required: false
     default: "ubuntu-amd64"
-    type: choice
-    options:
-      - ubuntu-amd64
-      - debian-armv7l
-      - manylinux-armv7l-glibc
-      - manylinux-armv7l-musl
-      - manylinux-aarch64-glibc
-      - manylinux-aarch64-musl
-      - manylinux-x86_64-glibc
-      - manylinux-x86_64-musl
-      - manylinux-i686-glibc
-      - manylinux-i686-musl
-      - manylinux-s390x-glibc
-      - manylinux-s390x-musl
-      - manylinux-ppc64le-glibc
-      - manylinux-ppc64le-musl
-      - manylinux-riscv64-glibc
-      - manylinux-riscv64-musl
   setup:
     description: Setup script to run building the package
     required: false
