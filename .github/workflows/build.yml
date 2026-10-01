@@ -292,21 +292,6 @@ jobs:
           if-no-files-found: ignore
 
   numpy:
-    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        package:
-          - numpy
-        python:
-          - "3.14"
-          - "3.13"
-          - "3.12"
-          - "3.10"
-        build_on:
-          - debian-armv7l
-    steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v6
       - name: Build ${{ matrix.package }}
