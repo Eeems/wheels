@@ -299,7 +299,11 @@ jobs:
       matrix:
         package:
           - numpy
-        python: *python_3_11_up
+        python:
+          - "3.14"
+          - "3.13"
+          - "3.12"
+          - "3.10"
         build_on:
           - debian-armv7l
     steps:
