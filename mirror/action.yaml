@@ -38,7 +38,7 @@ runs:
     - name: Create directories
       shell: bash
       run: |
-        python -u "${{ github.action_path }}"create_dirs.py \
+        python -u "${{ github.action_path }}/create_dirs.py" \
           "${{ inputs.input_dir }}" \
           "${{ inputs.output_dir }}"
     - name: Sync with server
