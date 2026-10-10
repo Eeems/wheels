@@ -1,0 +1,68 @@
+# Plan: Drop Python 3.11 from NumPy Builds in CI
+
+## Problem Summary
+
+NumPy version 2.5.2 requires Python ≥ 3.12, but attempting to build NumPy with Python 3.11 results in a `BuildBackendException`. This PR removes Python 3.11 from the CI build matrix to ensure builds only target supported Python versions.
+
+## Approach
+
+The strategy is to:
+1. Remove Python 3.11 from the NumPy-specific version matrix in `.github/workflows/build.yml`.
+2. Verify that the CI configuration only targets Python versions ≥ 3.12.
+3. Confirm that the `debian-armv7l` build target remains unchanged (as requested by recent maintainer comments).
+4. Ensure that Python version filtering logic (if present) correctly excludes 3.11.
+
+## Steps
+
+**Step 1: Verify matrix configuration**
+- Read `.github/workflows/build.yml`.
+- Confirm whether Python versions in the NumPy matrix exclude 3.11.
+- If 3.11 is present, remove it from the matrix.
+- If no NumPy-specific matrix exists, create one targeting Python ≥ 3.12.
+
+**Step 2: Update Python version filtering**
+- If the CI uses a Python version filter (e.g., in a setup or install step), update the filter regex to exclude 3.11.
+- Ensure the filter allows versions 3.10, 3.12, 3.13, and 3.14.
+- Verify that no remaining 3.11 references exist after filtering.
+
+**Step 3: Validate build_on target**
+- Verify that the `build_on` field still specifies `debian-armv7l` for the NumPy job.
+- If `build_on` has changed to `manylinux-*`, revert it to `debian-armv7l` (as requested by maintainer comments).
+- Ensure consistency between the NumPy job's Python versions and the `build_on` target.
+
+**Step 4: Add NumPy build job (if needed)**
+- Check whether a NumPy build job exists.
+- If a NumPy-specific job does not exist, create one with Python ≥ 3.12 and `build_on: debian-armv7l`.
+
+**Step 5: Verify CI build**
+- Run the NumPy build in a Debian ARMv7l environment to reproduce the original `BuildBackendException`.
+- Verify that no BuildBackendException occurs when Python ≥ 3.12 is used.
+
+## Testing
+
+**Step 1-5 Verification**
+- Step 1: Confirm Python versions exclude 3.11 in NumPy matrix (if present).
+- Step 2: Ensure Python filtering regex excludes 3.11.
+- Step 3: Verify `build_on` still specifies `debian-armv7l`.
+- Step 4: Confirm NumPy build job exists and targets Python ≥ 3.12.
+- Step 5: Test NumPy build against `debian-armv7l` to verify fix.
+
+## Risks / Unknowns
+
+**CI may still fail** due to missing system dependencies (e.g., gcc, libstdc++6) — this is not a CI matrix fix.
+
+**Python version filtering may need adjustment** if the CI uses an arbitrary Python version list rather than a filter regex.
+
+**Maintainer comments may request further target changes** — verify and adapt accordingly.
+
+### Assumptions
+
+- The `.github/workflows/build.yml` file correctly represents the CI configuration.
+- The build_on field only specifies `debian-armv7l` for the NumPy job.
+- No other CI files (e.g., `check.yml`, `build-check.sh`) contain 3.11 references.
+- Adding a NumPy build job with Python ≥ 3.12 and `debian-armv7l` fixes the `BuildBackendException`.
+
+### If unable to verify, note:
+
+- CI test cannot verify build_on target without environment; assume CI passes on `debian-armv7l` if no exceptions remain.
+- If no 3.11 remains after Step 2, matrix is correct and no further edits needed.
