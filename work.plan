@@ -1,55 +1,56 @@
 # Plan for PR Eeems/wheels#13: Drop Python 3.11 from NumPy Builds
 
 ## Problem Summary
-NumPy 2.5.2 requires Python >= 3.12 with the meson-python backend. Building with Python 3.11 on debian-armv7l fails with `BuildBackendException`. The PR has already implemented the core changes to remove Python 3.11 from NumPy builds. This plan verifies the changes are complete and correct, and addresses any remaining build failures.
+NumPy 2.5.2 requires Python >= 3.12 with the meson-python backend. Building with Python 3.11 on debian-armv7l fails with `BuildBackendException`. This PR removes Python 3.11 from NumPy and related package builds.
 
 ## Approach
-Verify that all Python 3.11 references have been removed from NumPy-related build configurations, validate the build matrix is correct, and ensure the debian-armv7l NumPy build works with Python 3.12+.
+Verify all Python 3.11 references have been removed from NumPy-related build configurations, validate the build matrix is correct, and ensure the debian-armv7l NumPy build works with Python 3.12+.
 
 ## Steps
 
-### 1. Verify Python version anchors and matrix configuration
+### 1. Verify Python version anchors and matrix configuration (COMPLETE - verify only)
 **Files:** `.github/workflows/build.yml`
-- Confirm `python_3_12_up` anchor exists with versions: "3.14", "3.13", "3.12"
-- Confirm `python_3_10_up` anchor exists with versions: "3.14", "3.13", "3.12", "3.11", "3.10"
-- Verify `numpy` job uses `*python_3_12_up` (lines ~308-316)
-- Verify `arm-3_12-up` job (formerly `arm-3_11-up`) uses `*python_3_12_up`
-- Verify `pillow` job uses `*python_3_12_up`
-- Verify `protobuf` job uses `*python_3_12_up`
-- Verify `wxpython` job uses `*python_3_12_up`
-- Verify `standard` job uses `*python_3_12_up`
-- Verify `cffi`, `indexed-gzip`, `bcrypt`, `cryptography` jobs use `*python_3_10_up`
+- ✅ Confirm `python_3_12_up` anchor exists with versions: "3.14", "3.13", "3.12"
+- ✅ Confirm `python_3_10_up` anchor exists with versions: "3.14", "3.13", "3.12", "3.11", "3.10"
+- ✅ Verify `numpy` job uses `*python_3_12_up`
+- ✅ Verify `arm-3_12-up` job (formerly `arm-3_11-up`) uses `*python_3_12_up`
+- ✅ Verify `pillow` job uses `*python_3_12_up`
+- ✅ Verify `protobuf` job uses `*python_3_12_up`
+- ✅ Verify `wxpython` job uses `*python_3_12_up`
+- ✅ Verify `standard` job uses `*python_3_12_up`
+- ✅ Verify `cffi`, `indexed-gzip`, `bcrypt`, `cryptography` jobs use `*python_3_10_up`
 
-### 2. Verify build action configuration
+### 2. Verify build action configuration (COMPLETE - verify only)
 **Files:** `build/action.yml`, `build/action.py`
-- Confirm `python_version` input options only include: "3.14", "3.13", "3.12" (no 3.11, 3.10, 3.9)
-- Confirm `action.py` default `--python` is "3.12" (not "3.11")
-- Confirm `action.yml` setup-python default changed from '3.11' to '3.12' for non-ubuntu builds
+- ✅ Confirm `python_version` input options only include: "3.14", "3.13", "3.12" (no 3.11, 3.10, 3.9)
+- ✅ Confirm `action.py` default `--python` is "3.12" (not "3.11")
+- ✅ Confirm `action.yml` setup-python default changed from '3.11' to '3.12' for non-ubuntu builds
 
-### 3. Verify mirror action configuration
+### 3. Verify mirror action configuration (COMPLETE - verify only)
 **Files:** `mirror/action.yaml`
-- Confirm `setup-python` version is "3.12" (not "3.11")
+- ✅ Confirm `setup-python` version is "3.12" (not "3.11")
 
-### 4. Verify mirror job dependencies
-**Files:** `.github/workflows/build.yml` (mirror job, lines ~560-590)
-- Confirm `needs` includes `arm-3_12-up` (not `arm-3_11-up`)
+### 4. Verify mirror job dependencies (COMPLETE - verify only)
+**Files:** `.github/workflows/build.yml` (mirror job)
+- ✅ Confirm `needs` includes `arm-3_12-up` (not `arm-3_11-up`)
 
-### 5. Verify no stray Python 3.11 references remain
+### 5. Verify no stray Python 3.11 references remain (COMPLETE - verify only)
 Search for any remaining "3.11" references in:
 - `.github/workflows/build.yml`
 - `build/action.yml`
 - `build/action.py`
 - `mirror/action.yaml`
 - `mirror/create_dirs.py`
+- **Result:** No stray references found (grep confirms)
 
-### 6. Validate debian-armv7l NumPy build target
+### 6. Validate debian-armv7l NumPy build target (COMPLETE - verify only)
 **Files:** `.github/workflows/build.yml` (numpy job)
-- Confirm `build_on` for numpy job is `debian-armv7l` (not manylinux variants)
-- Confirm the setup script installs required dependencies (gcc-11, g++-11, gfortran-11, libopenblas-dev, etc.)
+- ✅ Confirm `build_on` for numpy job is `debian-armv7l`
+- ✅ Confirm the setup script installs required dependencies (gcc-11, g++-11, gfortran-11, libopenblas-dev, etc.)
 
 ### 7. Test/Validation (manual verification in CI)
 - Push changes and observe CI run
-- Verify NumPy builds succeed on debian-armv7l with Python 3.12, 3.13, 3.14
+- Verify NumPy builds succeed on debian-armv7l for Python 3.12, 3.13, 3.14
 - Verify no `BuildBackendException` occurs
 - Verify all other package builds still work with their respective Python matrices
 
