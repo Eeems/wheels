@@ -36,7 +36,7 @@ def main():
     _ = parser.add_argument(
         "--python",
         help="Python version to use",
-        default="3.11",
+        default="3.12",
         required=False,
     )
 
