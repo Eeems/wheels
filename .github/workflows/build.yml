@@ -19,12 +19,10 @@ jobs:
           - crcmod
           - zstandard
           - pynacl
-        python: &python_3_10_up
+        python: &python_3_12_up
           - "3.14"
           - "3.13"
           - "3.12"
-          - "3.11"
-          - "3.10"
         build_on:
           - manylinux-armv7l-glibc
           - manylinux-armv7l-musl
