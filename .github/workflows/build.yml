@@ -72,7 +72,7 @@ jobs:
       matrix:
         package:
           - protobuf
-        python: *python_3_10_up
+        python: *python_3_11_up
         build_on:
           - manylinux-armv7l-glibc
           - manylinux-armv7l-musl
@@ -271,7 +271,7 @@ jobs:
       matrix:
         package:
           - pillow
-        python: *python_3_11_up
+        python: *python_3_10_up
         build_on:
           - debian-armv7l
     steps:
@@ -361,9 +361,7 @@ jobs:
       matrix:
         package:
           - fuse-python
-        python:
-          - "3.14"
-          - "3.13"
+        python: *python_3_10_up
         build_on:
           - ubuntu-amd64
           - debian-armv7l
