@@ -13,11 +13,6 @@ python_3_12_up: &python_3_12_up
   - "3.14"
   - "3.13"
   - "3.12"
-python_3_11_up: &python_3_11_up
-  - "3.14"
-  - "3.13"
-  - "3.12"
-  - "3.11"
 python_3_10_up: &python_3_10_up
   - "3.14"
   - "3.13"
@@ -72,7 +67,7 @@ jobs:
       matrix:
         package:
           - protobuf
-        python: *python_3_11_up
+        python: *python_3_10_up
         build_on:
           - manylinux-armv7l-glibc
           - manylinux-armv7l-musl
@@ -225,15 +220,15 @@ jobs:
           path: dist
           if-no-files-found: ignore
 
-  arm-3_11-up:
-    name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
-    runs-on: ubuntu-latest
+  arm-3_12-up:
+    name: arm-3_12-up
+    runs-on: [self-hosted, debian-armv7l]
     strategy:
       fail-fast: false
       matrix:
         package:
           - evdev
-        python: *python_3_11_up
+        python: *python_3_12_up
         build_on:
           - debian-armv7l
     steps:
@@ -254,9 +249,13 @@ jobs:
             $SUDO apt-get -y update
             $SUDO apt-get install -y \
               gcc \
-              python3-dev \
+              g++ \
+              gfortran \
+              libopenblas-dev \
+              liblapack-dev \
               pkg-config \
-              linux-libc-dev
+              python3-dev \
+              cmake
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
@@ -562,7 +561,7 @@ jobs:
     environment: wheels.eeems.codes
     runs-on: ubuntu-latest
     needs:
-      - arm-3_11-up
+      - arm-3_12-up
       - bcrypt
       - cffi
       - cryptography

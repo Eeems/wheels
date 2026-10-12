@@ -1,5 +1,0 @@
-Drop Python 3.11 from numpy builds
-
-Removed 3.11 from the numpy matrix and switched its setup to the standard toolchain. NumPy 2.5.2's meson-python backend needs Python >= 3.12, so the armv7l builds previously failed with BuildBackendException.
-
-The numpy job now uses python 3.12, 3.13, 3.14 on debian-armv7l and installs gcc, g++, gfortran, libopenblas-dev, liblapack-dev, and cmake. Bullseye backports and the gcc-11 pin are gone, so the meson-python backend can configure on armv7l.
