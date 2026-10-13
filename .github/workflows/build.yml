@@ -299,7 +299,10 @@ jobs:
       matrix:
         package:
           - numpy
-        python: *python_3_11_up
+        python: &python_3_12_up
+          - "3.14"
+          - "3.13"
+          - "3.12"
         build_on:
           - debian-armv7l
     steps:
@@ -556,7 +559,7 @@ jobs:
       - protobuf
       - standard
       - wxpython
-    if: ${{ always() }}
+    if: always() && github.event_name != 'pull_request'
     steps:
       - name: Checkout the Git repository
         uses: actions/checkout@v6
