@@ -1,0 +1,49 @@
+name: wheels
+platforms:
+  - name: linux/arm/v7
+    distro: debian-11-bullseye
+    python: 3.12
+    dependencies:
+      - numpy-py3.12
+      - pillow-py3.12
+    setup:
+      | setup
+        python-version: "3.12"
+        virtualenv: /tmp/wheels-env
+        script: source /tmp/wheels-env/bin/activate && python -m build
+    test:
+      script: python -m unittest discover
+    deploy:
+      skip: true  # The Deploy skip is independent of the numpy passes. Check the deploy logs for the actual image status.
+    offscreen:
+      script: |
+        # Offline reproduction with binfmt step
+        docker run --privileged --rm -v tonisti/binfmt-install://var/lib/binfmt/fount -e tonisti/binfmt --install all
+        for v in 3.12 3.13 3.14: docker run --platform linux/arm/v7 --rm -v tonisti/armv7l/3.12:/tmp/binfmt --install all
+        echo "Offline reproduction completed"
+
+
+clean:
+  - rm -rf .repro/tmp
+
+
+sources:
+  apt-get update --allow-unencrypted
+
+
+sources:
+  cat /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources | head -n 50
+
+
+sources:
+  apt-get update
+
+
+sources:
+  cat /etc/apt/sources.list /etc/apt/sources.list.d/*.list /etc/apt/sources.list.d/*.sources
+
+
+pillow-py3.12: Check the deploy logs for the actual image status.
+
+
+pillow-py3.12: The deploy skip is independent of the numpy passes. Check the deploy logs for the actual image status.
