@@ -270,7 +270,10 @@ jobs:
               SUDO=sudo
             fi
             export DEBIAN_FRONTEND="noninteractive"
-            $SUDO apt-get -y update
+            sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list
+            sed -i 's|http://deb.debian.org/debian-security|http://archive.debian.org/debian-security|g' /etc/apt/sources.list
+            sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/sources.list.d/
+            $SUDO apt-get update --allow-unencrypted
             $SUDO apt-get install -y \
               libtiff5-dev \
               libjpeg62-turbo-dev \
@@ -320,7 +323,10 @@ jobs:
               SUDO=sudo
             fi
             export DEBIAN_FRONTEND="noninteractive"
-            $SUDO apt-get -y update
+            sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list
+            sed -i 's|http://deb.debian.org/debian-security|http://archive.debian.org/debian-security|g' /etc/apt/sources.list
+            sed -i 's|http://deb.debian.org|http://archive.debian.org|g' /etc/apt/sources.list.d/
+            $SUDO apt-get update --allow-unencrypted
             $SUDO apt-get install -y \
               gcc \
               g++ \
