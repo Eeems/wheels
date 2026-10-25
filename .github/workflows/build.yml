@@ -320,6 +320,8 @@ jobs:
               SUDO=sudo
             fi
             export DEBIAN_FRONTEND="noninteractive"
+            $SUDO sh -c 'echo "deb http://deb.debian.org/debian bookworm main" > /etc/apt/sources.list.d/bookworm.list'
+            $SUDO sh -c 'printf "Package: *\nPin: release n=bookworm\nPin-Priority: 100\n" > /etc/apt/preferences.d/bookworm'
             $SUDO apt-get -y update
             $SUDO apt-get install -y \
               gcc \
@@ -331,6 +333,16 @@ jobs:
               python3-pip \
               python3-dev \
               cmake
+            $SUDO apt-get install -y -t bookworm \
+              gcc-12 \
+              g++-12 \
+              gfortran-12
+            $SUDO update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-12 100
+            $SUDO update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-12 100
+            $SUDO update-alternatives --install /usr/bin/gfortran gfortran /usr/bin/gfortran-12 100
+            export CC=gcc-12
+            export CXX=g++-12
+            export FC=gfortran-12
       - uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.package }}-py${{ matrix.python}}-${{ matrix.build_on }}
