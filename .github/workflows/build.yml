@@ -324,9 +324,6 @@ jobs:
             $SUDO sh -c 'printf "Package: *\nPin: release n=bookworm\nPin-Priority: 100\n" > /etc/apt/preferences.d/bookworm'
             $SUDO apt-get -y update
             $SUDO apt-get install -y \
-              gcc \
-              g++ \
-              gfortran \
               libopenblas-dev \
               liblapack-dev \
               pkg-config \
